@@ -57,15 +57,4 @@ services:
 
 volumes:
   postgres-data:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: './data/postgres'
-
   upload-data:
-    driver: local
-    driver_opts:
-      type: 'none'
-      o: 'bind'
-      device: './data/upload'
