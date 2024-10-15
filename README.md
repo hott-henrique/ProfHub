@@ -1,6 +1,6 @@
-# **F**astAPI **S**tremlit and **P**ostgreSQL Template
+# ProfHub
 
-FSP is a project template for using fastapi, streamlit and postgres in containers.
+ProfHub is an application for technology professionals keep track of its carrer achievements.
 
 ## Running the project
 
