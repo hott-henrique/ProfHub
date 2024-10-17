@@ -37,3 +37,24 @@ class UserPersistence(object):
                 return None
 
             return data['id']
+
+    def get_by_email(self, email: str) -> dict:
+        db = get_postgres_db()
+
+        with db.cursor() as cursor:
+            cursor.execute(
+                '''
+                    SELECT *
+                    FROM ProfHub.User AS u
+                    WHERE u.email = %s;
+                ''',
+                (email, )
+            )
+
+            data: dict = cursor.fetchone()
+
+            if not data:
+                # TODO: RAISE ERROR.
+                return None
+
+            return data

@@ -5,7 +5,10 @@ import fastapi
 
 import psycopg2
 import psycopg2.extras
+
 import pydantic
+
+import werkzeug.security
 
 from api.control.connector import get_controller
 
@@ -13,8 +16,6 @@ from model.Register import Register
 from model.Auth import Auth
 from model.Login import Login
 from model.User import User
-
-import werkzeug.security
 
 
 router = fastapi.APIRouter()
@@ -31,7 +32,10 @@ def register(data: Register) -> str:
         "github": data.github
     })
 
-    controller.user.create(user=user)
+    try:
+        controller.user.create(user=user)
+    except psycopg2.errors.UniqueViolation:
+        raise fastapi.exceptions.HTTPException(status_code=409, detail="Email already in use.")
 
     if not user.id:
         controller.rollback()
@@ -51,4 +55,16 @@ def register(data: Register) -> str:
 @router.post("/login")
 def login(data: Login) -> str:
     controller = get_controller()
-    return str(uuid.uuid4())
+
+    try:
+        user = controller.user.get_user_by_email(email=data.email)
+    except pydantic.ValidationError:
+        raise fastapi.exceptions.HTTPException(status_code=404, detail="Email not registered yet.")
+
+    auth = controller.auth.get_user_auth_info(user)
+
+    if werkzeug.security.check_password_hash(auth.password_hash, data.password):
+        # TODO: Do we need to implement authenticated requests?
+        return "OK"
+
+    raise fastapi.exceptions.HTTPException(status_code=401)
