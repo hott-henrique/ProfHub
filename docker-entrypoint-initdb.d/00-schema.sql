@@ -7,7 +7,7 @@ CREATE TABLE ProfHub.USER (
 
     name      VARCHAR(128) NOT NULL,
     birthdate DATE         NOT NULL,
-    email     VARCHAR(254) NOT NULL,
+    email     VARCHAR(254) NOT NULL UNIQUE,
     phone     VARCHAR(128) NOT NULL,
     github    VARCHAR(128) NOT NULL,
 
@@ -95,6 +95,15 @@ CREATE TABLE ProfHub.AcademicBackground(
     description      TEXT         NOT NULL,
 
     PRIMARY KEY (id),
+
+    FOREIGN KEY (uid) REFERENCES ProfHub.User(id) ON DELETE CASCADE
+);
+
+CREATE TABLE ProfHub.Auth(
+    uid              BIGINT       NOT NULL,
+    password_hash    TEXT         NOT NULL,
+
+    PRIMARY KEY (uid),
 
     FOREIGN KEY (uid) REFERENCES ProfHub.User(id) ON DELETE CASCADE
 );

@@ -8,7 +8,7 @@ def main():
 
     st.write("# Welcome to Streamlit! Hot Reloading Is Working!")
 
-    response: requests.Response = requests.get(os.environ["API_URL"] + "/hello", params=dict(user="User"))
+    response: requests.Response = requests.get(os.environ["API_URL"] + "/ping")
 
     message: str = f"API Server response: {response.json()}." if response.ok else "API Server is offline."
 

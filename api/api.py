@@ -5,28 +5,28 @@ import fastapi
 import psycopg2
 import psycopg2.extras
 
+from api.control.connector import get_controller
+
+from api.endpoint import auth
+
 
 api = fastapi.FastAPI(title="ProfHub - API",
                       root_path="/api",
                       version="0.1.0")
 
-@api.get("/hello")
-def hello(user: str = "World") -> str:
-    conn =  psycopg2.connect(
-        user=os.environ["POSTGRES_USER"],
-        password=os.environ["POSTGRES_PASSWORD"],
-        host=os.environ["POSTGRES_HOST"],
-        port="5432",
-        dbname=os.environ["POSTGRES_DB"],
-        cursor_factory=psycopg2.extras.RealDictCursor
+@api.exception_handler(Exception)
+async def unhandled_exception_handler(request: fastapi.Request, exc: Exception):
+    controller = get_controller()
+
+    controller.rollback()
+
+    return fastapi.responses.JSONResponse(
+        status_code=500,
+        content={ "message": f"Something unkown went wrong, please contact support." }
     )
 
-    cursor = conn.cursor()
+@api.get("/ping")
+def ping():
+    return "OK"
 
-    cursor.execute("SELECT 1 AS ok;")
-
-    result : dict = cursor.fetchone()
-
-    conn.close()
-
-    return f"Hello, {user}! Is database on? {result['ok'] == 1}"
+api.include_router(auth.router)
