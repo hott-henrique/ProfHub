@@ -5,7 +5,7 @@ import pydantic
 
 
 class WorkingExperience(pydantic.BaseModel):
-    id: int = 0
+    id: t.Optional[int] = None
     uid: int
     job: str = pydantic.Field(max_length=32)
     company: str = pydantic.Field(max_length=128)

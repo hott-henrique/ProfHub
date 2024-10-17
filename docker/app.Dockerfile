@@ -10,11 +10,10 @@ RUN apt install -y python3.11 python3.11-dev python3-pip
 
 WORKDIR /usr/src/app
 
-COPY app/ app/
-COPY model/ model/
+COPY app/requirements.txt requirements.txt
 
 RUN pip install --upgrade pip
-RUN pip install -r app/requirements.txt
+RUN pip install -r requirements.txt
 
 EXPOSE 80
 

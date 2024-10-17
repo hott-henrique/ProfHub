@@ -15,7 +15,7 @@ class LanguageProciencyLevel(str, enum.Enum):
     C2 = "C2"
 
 class LanguageKnowledge(pydantic.BaseModel):
-    id: int = 0
+    id: t.Optional[int] = None
     uid: int
     lid: int
     proficiency_level: LanguageProciencyLevel = pydantic.Field(max_length=128)

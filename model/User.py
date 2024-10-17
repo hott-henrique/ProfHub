@@ -5,7 +5,7 @@ import pydantic
 
 
 class User(pydantic.BaseModel):
-    id: int = 0
+    id: t.Optional[int] = None
     name: str = pydantic.Field(max_length=128)
     email: str = pydantic.Field(max_length=254)
     phone: str = pydantic.Field(max_length=128)

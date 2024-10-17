@@ -5,7 +5,7 @@ import pydantic
 
 
 class Certificate(pydantic.BaseModel):
-    id: int = 0
+    id: t.Optional[int] = None
     uid: int
     name: str = pydantic.Field(max_length=32)
     validation_key: str

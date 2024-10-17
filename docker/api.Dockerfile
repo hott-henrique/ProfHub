@@ -10,14 +10,13 @@ RUN apt install -y python3.11 python3.11-dev python3-pip
 
 WORKDIR /usr/src/app
 
-COPY api/ api/
-COPY model/ model/
+COPY api/requirements.txt requirements.txt
 
 RUN pip install --upgrade pip
-RUN pip install -r api/requirements.txt
+RUN pip install -r requirements.txt
 
 EXPOSE 80
 
 SHELL [ "/bin/bash", "-c"]
 
-CMD [ "fastapi", "run", "api", "--port", "80" ]
+CMD [ "fastapi", "dev", "api", "--host", "0.0.0.0", "--port", "80" ]

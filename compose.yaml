@@ -24,6 +24,8 @@ services:
     env_file: ./environments/app.env
     volumes:
       - upload-data:/usr/src/app/data
+      - ./app:/usr/src/app/app
+      - ./model:/usr/src/app/model
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -35,6 +37,8 @@ services:
     env_file: ./environments/api.env
     volumes:
       - upload-data:/usr/src/app/data
+      - ./api:/usr/src/app/api
+      - ./model:/usr/src/app/model
     depends_on:
       database:
         condition: service_healthy
