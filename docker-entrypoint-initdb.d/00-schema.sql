@@ -92,6 +92,7 @@ CREATE TABLE ProfHub.AcademicBackground(
     institution      VARCHAR(128) NOT NULL,
     starting_date    DATE         NOT NULL,
     ending_date      DATE         NOT NULL,
+    workload         INT          NOT NULL,
     description      TEXT         NOT NULL,
 
     PRIMARY KEY (id),

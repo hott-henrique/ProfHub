@@ -11,4 +11,5 @@ class AcademicBackground(pydantic.BaseModel):
     institution: str = pydantic.Field(max_length=128)
     starting_date: dt.datetime
     ending_date: dt.datetime
+    workload: int
     description: str
