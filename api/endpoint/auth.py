@@ -35,6 +35,7 @@ def register(data: Register) -> str:
     try:
         controller.user.create(user=user)
     except psycopg2.errors.UniqueViolation:
+        controller.rollback()
         raise fastapi.exceptions.HTTPException(status_code=409, detail="Email already in use.")
 
     if not user.id:
@@ -64,7 +65,6 @@ def login(data: Login) -> str:
     auth = controller.auth.get_user_auth_info(user)
 
     if werkzeug.security.check_password_hash(auth.password_hash, data.password):
-        # TODO: Do we need to implement authenticated requests?
         return "OK"
 
     raise fastapi.exceptions.HTTPException(status_code=401)
