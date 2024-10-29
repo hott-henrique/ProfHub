@@ -1,10 +1,6 @@
-import os
-import uuid
-
 import fastapi
 
 import psycopg2
-import psycopg2.extras
 
 import pydantic
 
@@ -18,10 +14,10 @@ from model.Login import Login
 from model.User import User
 
 
-router = fastapi.APIRouter()
+router = fastapi.APIRouter(prefix="/auth")
 
 @router.post("/register")
-def register(data: Register) -> str:
+def register(data: Register) -> int:
     controller = get_controller()
 
     user = User.model_validate({
@@ -40,7 +36,7 @@ def register(data: Register) -> str:
 
     if not user.id:
         controller.rollback()
-        raise fastapi.exceptions.HTTPException(status_code=500, detail="Failed to create user.")
+        raise fastapi.exceptions.HTTPException(status_code=500, detail="Server error.")
 
     auth = Auth.model_validate({
         "uid": user.id,
@@ -51,10 +47,10 @@ def register(data: Register) -> str:
 
     controller.commit()
 
-    return "OK"
+    return auth.uid
 
 @router.post("/login")
-def login(data: Login) -> str:
+def login(data: Login) -> int:
     controller = get_controller()
 
     try:
@@ -65,6 +61,6 @@ def login(data: Login) -> str:
     auth = controller.auth.get_user_auth_info(user)
 
     if werkzeug.security.check_password_hash(auth.password_hash, data.password):
-        return "OK"
+        return auth.uid
 
-    raise fastapi.exceptions.HTTPException(status_code=401)
+    raise fastapi.exceptions.HTTPException(status_code=401, detail="Wrong password")

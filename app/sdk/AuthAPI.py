@@ -9,13 +9,13 @@ from model.Register import Register
 class AuthAPI:
 
     @classmethod
-    def register(cls, register: Register) -> str:
+    def register(cls, register: Register) -> int:
         data = register.model_dump()
 
         data["birthdate"] = data["birthdate"].isoformat()
 
         response = requests.post(
-            url=os.environ.get("API_URL", "http://localhost:8080/api/register"),
+            url="http://localhost:8080/api/auth/register",
             json=data
         )
 
@@ -27,11 +27,10 @@ class AuthAPI:
 
         return response.json()
 
-
     @classmethod
-    def login(cls, login: Login) -> str:
+    def login(cls, login: Login) -> int:
         response = requests.post(
-            url=os.environ.get("API_URL", "http://localhost:8080/api/login"),
+            url="http://localhost:8080/api/auth/login",
             json=login.model_dump()
         )
 

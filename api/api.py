@@ -8,6 +8,7 @@ import psycopg2.extras
 from api.control.connector import get_controller
 
 from api.endpoint import auth
+from api.endpoint import academic_background
 
 
 api = fastapi.FastAPI(title="ProfHub - API",
@@ -30,3 +31,4 @@ def ping():
     return "OK"
 
 api.include_router(auth.router)
+api.include_router(academic_background.router)

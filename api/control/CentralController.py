@@ -2,6 +2,7 @@ from api.persistence.CentralPersistence import CentralPersistence
 
 from api.control.AuthController import AuthController
 from api.control.UserController import UserController
+from api.control.AcademicBackgroundController import AcademicBackgroundController
 
 
 class CentralController(object):
@@ -10,6 +11,7 @@ class CentralController(object):
         self.persistence = CentralPersistence()
         self.auth = AuthController(persistence=self.persistence)
         self.user = UserController(persistence=self.persistence)
+        self.academic_background = AcademicBackgroundController(persistence=self.persistence)
 
     def commit(self):
         self.persistence.commit()
