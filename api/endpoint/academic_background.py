@@ -4,7 +4,7 @@ import fastapi
 
 from api.control.connector import get_controller
 
-from model.AcademicBackground import AcademicBackground
+from model.AcademicBackground import AcademicBackground, EducationLevel
 
 
 router = fastapi.APIRouter(prefix="/academic-background", tags=[ "AcademicBackground" ])
@@ -50,7 +50,7 @@ def get_all_from_uid(uid: int) -> list[AcademicBackground]:
     return controller.academic_background.get_all_from_uid(uid=uid)
 
 @router.get("/search/")
-def search_by_text(query: str) -> list[AcademicBackground]:
+def search_by_text(query: str, education_level: EducationLevel | None = None) -> list[AcademicBackground]:
     controller = get_controller()
 
-    return controller.academic_background.search_by_text(query=query)
+    return controller.academic_background.search_by_text(query=query, education_level=education_level)

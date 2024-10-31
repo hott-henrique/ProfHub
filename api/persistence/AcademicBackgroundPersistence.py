@@ -91,7 +91,7 @@ class AcademicBackgroundPersistence(object):
 
             return cursor.fetchall()
 
-    def search(self, query: str) -> list[dict]:
+    def search(self, query: str, education_level: str | None = None) -> list[dict]:
         db = get_postgres_db()
 
         with db.cursor() as cursor:
@@ -107,4 +107,9 @@ class AcademicBackgroundPersistence(object):
                 { "query": f"%{query}%" }
             )
 
-            return cursor.fetchall()
+            data = cursor.fetchall()
+
+            if education_level:
+                data = list(filter(lambda obj: obj["level"] == education_level, data))
+
+            return data

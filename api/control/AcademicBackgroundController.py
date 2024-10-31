@@ -1,6 +1,6 @@
 from api.persistence.CentralPersistence import CentralPersistence
 
-from model.AcademicBackground import AcademicBackground
+from model.AcademicBackground import AcademicBackground, EducationLevel
 
 
 class AcademicBackgroundController(object):
@@ -20,5 +20,9 @@ class AcademicBackgroundController(object):
     def get_all_from_uid(self, uid: int) -> list[AcademicBackground]:
         return [ AcademicBackground.validate(a) for a in self.persistence.academic_background.get_all_from_uid(uid=uid) ]
 
-    def search_by_text(self, query: str) -> list[AcademicBackground]:
-        return [ AcademicBackground.validate(a) for a in self.persistence.academic_background.search(query=query) ]
+    def search_by_text(self, query: str, education_level: EducationLevel | None = None) -> list[AcademicBackground]:
+        return [
+            AcademicBackground.validate(a)
+            for a
+            in self.persistence.academic_background.search(query=query, education_level=education_level)
+        ]
