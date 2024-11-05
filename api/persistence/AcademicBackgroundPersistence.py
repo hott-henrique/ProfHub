@@ -67,7 +67,7 @@ class AcademicBackgroundPersistence(object):
         with db.cursor() as cursor:
             cursor.execute(
                 '''
-                    DELETE *
+                    DELETE
                     FROM ProfHub.AcademicBackground AS a
                     WHERE a.id = %s;
                 ''',

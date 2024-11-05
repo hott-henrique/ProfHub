@@ -9,6 +9,7 @@ from api.control.connector import get_controller
 
 from api.endpoint import auth
 from api.endpoint import academic_background
+from api.endpoint import working_experience
 
 
 api = fastapi.FastAPI(title="ProfHub - API",
@@ -32,3 +33,4 @@ def ping():
 
 api.include_router(auth.router)
 api.include_router(academic_background.router)
+api.include_router(working_experience.router)
