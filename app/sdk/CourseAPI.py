@@ -2,20 +2,19 @@ import os
 
 import requests
 
-from model.AcademicBackground import AcademicBackground, EducationLevel
+from model.Course import Course
 
 
-class AcademicBackgroundAPI:
+class CourseAPI:
 
     @classmethod
-    def create(cls, academic_background: AcademicBackground) -> int:
-        data = academic_background.model_dump()
+    def create(cls, course: Course) -> int:
+        data = course.model_dump()
 
-        data["starting_date"] = data["starting_date"].isoformat()
-        data["ending_date"] = data["ending_date"].isoformat()
+        data["date"] = data["date"].isoformat()
 
         response = requests.post(
-            url="http://localhost:8080/api/academic-background/",
+            url="http://localhost:8080/api/course/",
             json=data
         )
 
@@ -26,14 +25,13 @@ class AcademicBackgroundAPI:
         return response.json()
 
     @classmethod
-    def update(cls, id: int, academic_background: AcademicBackground) -> bool:
-        data = academic_background.model_dump()
+    def update(cls, id: int, course: Course) -> bool:
+        data = course.model_dump()
 
-        data["starting_date"] = data["starting_date"].isoformat()
-        data["ending_date"] = data["ending_date"].isoformat()
+        data["date"] = data["date"].isoformat()
 
         response = requests.put(
-            url=f"http://localhost:8080/api/academic-background/{id}",
+            url=f"http://localhost:8080/api/course/{id}",
             json=data
         )
 
@@ -46,7 +44,7 @@ class AcademicBackgroundAPI:
     @classmethod
     def delete(cls, id: int) -> bool:
         response = requests.delete(
-            url=f"http://localhost:8080/api/academic-background/{id}",
+            url=f"http://localhost:8080/api/course/{id}",
         )
 
         if not response.ok:
@@ -56,9 +54,9 @@ class AcademicBackgroundAPI:
         return response.json()
 
     @classmethod
-    def get_all_from_uid(cls, uid: int) -> list[AcademicBackground]:
+    def get_all_from_uid(cls, uid: int) -> list[Course]:
         response = requests.get(
-            url=f"http://localhost:8080/api/academic-background/{uid}",
+            url=f"http://localhost:8080/api/course/{uid}",
         )
 
         if not response.ok:
@@ -68,10 +66,10 @@ class AcademicBackgroundAPI:
         return response.json()
 
     @classmethod
-    def search_by_text(cls, query: str, education_level: EducationLevel) -> list[AcademicBackground]:
+    def search_by_text(cls, query: str) -> list[Course]:
         response = requests.get(
-            url=f"http://localhost:8080/api/academic-background/search/",
-            params=dict(query=query, education_level=education_level)
+            url=f"http://localhost:8080/api/course/search/",
+            params=dict(query=query)
         )
 
         if not response.ok:
