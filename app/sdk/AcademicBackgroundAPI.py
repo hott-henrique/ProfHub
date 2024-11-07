@@ -69,10 +69,10 @@ class AcademicBackgroundAPI:
 
     # TODO: add EducationLevel argument.
     @classmethod
-    def search_by_text(cls, query: str) -> list[AcademicBackground]:
+    def search_by_text(cls, query: str, education_level: EducationLevel) -> list[AcademicBackground]:
         response = requests.get(
             url=f"http://localhost:8080/api/academic-background/search/",
-            params=dict(query=query)
+            params=dict(query=query, education_level=education_level)
         )
 
         if not response.ok:
