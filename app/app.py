@@ -46,7 +46,7 @@ def cadastro():
 
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
-    st.sidebar.image("app/images/profhub-logo7.png")
+    st.sidebar.image("app/images/profhub-logo.png")
 
     with st.sidebar:
         selected = option_menu(
