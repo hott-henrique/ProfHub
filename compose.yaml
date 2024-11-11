@@ -38,7 +38,7 @@ services:
     volumes:
       - upload-data:/usr/src/app/data
       - ./api:/usr/src/app/api
-      - ./model:/usr/src/app/app/model
+      - ./model:/usr/src/app/model
     depends_on:
       database:
         condition: service_healthy

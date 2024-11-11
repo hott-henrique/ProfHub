@@ -1,18 +1,22 @@
 import requests, os
+
+from datetime import date
+
 import streamlit as st
 
-from model import Register
 from streamlit_option_menu import option_menu
-from datetime import date
-from api.endpoint import auth
 
-@st.dialog("Entrar")        
+from model.Register import Register
+from sdk.AuthAPI import AuthAPI
+
+
+@st.dialog("Entrar")
 def login():
     email = st.text_input(label="E-mail")
     password = st.text_input(label="Senha", type="password")
-    
+
     login_button = st.button("Entrar", use_container_width=True)
-            
+
     if login_button:
         print("login")
 
@@ -24,7 +28,7 @@ def cadastro():
     phone         = st.text_input(label= "Telefone", )
     github        = st.text_input(label= "Github")
     password      = st.text_input(label = "Senha", type = "password")
-        
+
     data = {
         "email": email,
         "password": password,
@@ -32,14 +36,14 @@ def cadastro():
         "phone": phone,
         "github": github,
         "birthdate": birthdate
-    }   
-    
+    }
+
     submit = st.button("Cadastrar", use_container_width=True)
-    
+
     if submit:
         try:
-            new_user = Register.Register(**data)
-            auth.register(new_user)
+            new_user = Register(**data)
+            AuthAPI.register(new_user)
             st.success("Usuário cadastrado com sucesso!")
         except Exception as e:
             st.error(f"Erro de cadastro: {e}")
@@ -56,7 +60,6 @@ def main():
             default_index=0,
             orientation="horizontal",
         )
-        
 
     if selected == "Login":
         login()
@@ -68,5 +71,6 @@ def main():
     message: str = f"API Server response: {response.json()}." if response.ok else "API Server is offline."
 
     st.markdown(message)
+
 if __name__ == "__main__":
     main()
