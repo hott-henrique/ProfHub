@@ -1,24 +1,34 @@
-import requests, os
-
-from datetime import date
-
 import streamlit as st
 
+from datetime import date
 from streamlit_option_menu import option_menu
-
 from model.Register import Register
+from model.Login import Login
 from sdk.AuthAPI import AuthAPI
-
+from streamlit_lottie import st_lottie
 
 @st.dialog("Entrar")
 def login():
-    email = st.text_input(label="E-mail")
+    if 'user' not in st.session_state: st.session_state['user'] = None
+
+    email    = st.text_input(label="E-mail")
     password = st.text_input(label="Senha", type="password")
 
     login_button = st.button("Entrar", use_container_width=True)
 
+    data = {
+        'email' : email,
+        'password' : password
+    }
+
     if login_button:
-        print("login")
+        try:
+            new_login = Login(**data)
+            user_data = AuthAPI.login(new_login)
+            st.session_state['user'] = email
+            st.switch_page("pages/home.py")
+        except Exception as e:
+            st.error(f"Erro de login: {e}")
 
 @st.dialog("Cadastrar")
 def cadastro():
@@ -61,16 +71,81 @@ def main():
             orientation="horizontal",
         )
 
-    if selected == "Login":
-        login()
-    elif selected == "Cadastro":
-        cadastro()
+        if selected == "Login":
+            login()
+        elif selected == "Cadastro":
+            cadastro()
+    
+        st.chat_input(placeholder="Faça sua busca")
+    st.title("_:red[Prof]Hub_, sua vitrine profissional ", anchor=False)
+    
+    col1, col2, col3 = st.tabs(['O ProfHub', 'O Profissional', 'A empresa'])
 
-    response: requests.Response = requests.get(os.environ["API_URL"] + "/ping")
+    with col1:
+        st.subheader("O ProfHub conecta profissionais e empresas.")
+        c1, c2 = st.columns(spec=2)
 
-    message: str = f"API Server response: {response.json()}." if response.ok else "API Server is offline."
+        with c1:
+            st.markdown("""
+                <div style="text-align: justify;">
+                    <br>O <span style="color: red;">Prof</span><span style="color: black;">Hub</span> 
+                    nasceu com a ideia de destacar de simplificar a conexão entre profissionais de
+                    tecnologia e empresas contratantes, oferecendo ferramentas para o profissional
+                    se destacar e opções para que as empresas encontrem os melhores profissionais.
+                </div>
+            """, unsafe_allow_html=True)
 
-    st.markdown(message)
+        with c2:
+            st_lottie("https://lottie.host/8220a679-4cae-4d7a-88d4-d55c7a84ecda/WJ56RWIOqP.json",
+                      key="ProfHub",
+                      quality='high',
+                      speed=0.1,
+                      height=220)
+        
+    with col2:
+        st.subheader("Construa seu currículo e destaque-se para o mercado.")
+        c1, c2 = st.columns(spec=2)
+
+        with c1:
+            st.markdown("""
+                <div style="text-align: justify;">
+                    <br>O profissional conta com as melhores ferramentas para destacar seu currículo, 
+                    no <span style="color: red;">Prof</span><span style="color: black;">Hub</span>
+                    ele pode apresentar suas experiências, cursos, certificações, 
+                    idiomas e formação acadêmica. Suas competências cadastradas serão 
+                    apresentadas em filtos, para aqueles que quiserem encontrar um profissional com 
+                    determinado perfil.
+                </div>
+            """, unsafe_allow_html=True)
+
+        with c2:
+            st_lottie("https://lottie.host/809d4498-47e6-41ba-8af3-5fb59ff21ab7/3rqDNPsG5k.json",
+                      key="Profissional",
+                      quality='high',
+                      speed=0.1,
+                      height=250)
+    with col3:
+        st.subheader("Encontre os melhores profissionais para sua empresa.")
+        c1, c2 = st.columns(spec=2)
+
+        with c1:
+            st.markdown("""
+                <div style="text-align: justify;">
+                As empresas podem buscar os melhores profissionais de acordo com os requisitos do seu
+                negócio, é possível buscar formação acadêmica, certificações e habilidades. Além de visualizar
+                os currículos dos profissionais buscados o 
+                <span style="color: red;">Prof</span><span style="color: black;">Hub</span> também 
+                oferece um relatório personalizado dos profissionais que possuem mais certificações por
+                formação acadêmica.    
+                </div>
+            """, unsafe_allow_html=True)
+
+        with c2:
+            st_lottie("https://lottie.host/475b7a1c-b0ce-4b70-a721-1210e7dca8e7/elMtyxh915.json",
+                      key="Empresa",
+                      quality='high',
+                      speed=0.1,
+                      height=220)
 
 if __name__ == "__main__":
     main()

@@ -15,7 +15,7 @@ class AuthAPI:
         data["birthdate"] = data["birthdate"].isoformat()
 
         response = requests.post(
-            url="http://localhost:8080/api/auth/register",
+            url=os.environ['API_URL'] + "/auth/register",
             json=data
         )
 
@@ -30,7 +30,7 @@ class AuthAPI:
     @classmethod
     def login(cls, login: Login) -> int:
         response = requests.post(
-            url="http://localhost:8080/api/auth/login",
+            url=os.environ['API_URL'] + "/auth/login",
             json=login.model_dump()
         )
 

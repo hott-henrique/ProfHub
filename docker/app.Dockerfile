@@ -11,6 +11,7 @@ RUN apt install -y python3.11 python3.11-dev python3-pip
 WORKDIR /usr/src/app
 
 COPY app/requirements.txt requirements.txt
+COPY .streamlit /usr/src/app/.streamlit
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
