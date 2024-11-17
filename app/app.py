@@ -132,8 +132,8 @@ def main():
             st.markdown("""
                 <div style="text-align: justify;">
                 As empresas podem buscar os melhores profissionais de acordo com os requisitos do seu
-                negócio, é possível buscar formação acadêmica, certificações e habilidades. Além de visualizar
-                os currículos dos profissionais buscados o 
+                negócio, é possível quaisquer características na ferramenta de busca geral.
+                Além de visualizar os currículos dos profissionais buscados o 
                 <span style="color: red;">Prof</span><span style="color: black;">Hub</span> também 
                 oferece um relatório personalizado dos profissionais que possuem mais certificações por
                 formação acadêmica.    
