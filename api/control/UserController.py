@@ -13,3 +13,7 @@ class UserController(object):
     def get_user_by_email(self, email: str) -> User:
         user_data = self.persistence.user.get_by_email(email=email)
         return User.model_validate(user_data)
+
+    def get_user_by_id(self, id: int) -> User:
+        user_data = self.persistence.user.get_by_id(id=id)
+        return User.model_validate(user_data)

@@ -17,7 +17,7 @@ from model.User import User
 router = fastapi.APIRouter(prefix="/auth")
 
 @router.post("/register")
-def register(data: Register) -> int:
+def register(data: Register) -> User:
     controller = get_controller()
 
     user = User.model_validate({
@@ -47,10 +47,10 @@ def register(data: Register) -> int:
 
     controller.commit()
 
-    return auth.uid
+    return controller.user.get_user_by_id(id=auth.uid)
 
 @router.post("/login")
-def login(data: Login) -> int:
+def login(data: Login) -> User:
     controller = get_controller()
 
     try:
@@ -61,6 +61,6 @@ def login(data: Login) -> int:
     auth = controller.auth.get_user_auth_info(user)
 
     if werkzeug.security.check_password_hash(auth.password_hash, data.password):
-        return auth.uid
+        return controller.user.get_user_by_id(id=auth.uid)
 
     raise fastapi.exceptions.HTTPException(status_code=401, detail="Wrong password")

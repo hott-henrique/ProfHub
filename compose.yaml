@@ -1,7 +1,7 @@
 services:
   nginx:
     image: nginx:1.12.0
-    container_name: "nginx"
+    container_name: "profhub-nginx"
     restart: "always"
     healthcheck:
       test: ["CMD", "service", "nginx", "status"]
@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: docker/app.Dockerfile
-    container_name: "app"
+    container_name: "profhub-app"
     env_file: ./environments/app.env
     volumes:
       - upload-data:/usr/src/app/data
@@ -33,7 +33,7 @@ services:
     build:
       context: .
       dockerfile: docker/api.Dockerfile
-    container_name: "api"
+    container_name: "profhub-api"
     env_file: ./environments/api.env
     volumes:
       - upload-data:/usr/src/app/data
@@ -44,7 +44,7 @@ services:
         condition: service_healthy
 
   database:
-      container_name: "database"
+      container_name: "profhub-database"
       image: postgres:16
       restart: always
       healthcheck:

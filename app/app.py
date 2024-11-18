@@ -75,10 +75,10 @@ def main():
             login()
         elif selected == "Cadastro":
             cadastro()
-    
+
         st.chat_input(placeholder="Faça sua busca")
     st.title("_:red[Prof]Hub_, sua vitrine profissional ", anchor=False)
-    
+
     col1, col2, col3 = st.tabs(['O ProfHub', 'O Profissional', 'A empresa'])
 
     with col1:
@@ -88,7 +88,7 @@ def main():
         with c1:
             st.markdown("""
                 <div style="text-align: justify;">
-                    <br>O <span style="color: red;">Prof</span><span style="color: black;">Hub</span> 
+                    <br>O <span style="color: red;">Prof</span><span style="color: black;">Hub</span>
                     nasceu com a ideia de destacar de simplificar a conexão entre profissionais de
                     tecnologia e empresas contratantes, oferecendo ferramentas para o profissional
                     se destacar e opções para que as empresas encontrem os melhores profissionais.
@@ -101,7 +101,7 @@ def main():
                       quality='high',
                       speed=0.1,
                       height=220)
-        
+
     with col2:
         st.subheader("Construa seu currículo e destaque-se para o mercado.")
         c1, c2 = st.columns(spec=2)
@@ -109,11 +109,11 @@ def main():
         with c1:
             st.markdown("""
                 <div style="text-align: justify;">
-                    <br>O profissional conta com as melhores ferramentas para destacar seu currículo, 
+                    <br>O profissional conta com as melhores ferramentas para destacar seu currículo,
                     no <span style="color: red;">Prof</span><span style="color: black;">Hub</span>
-                    ele pode apresentar suas experiências, cursos, certificações, 
-                    idiomas e formação acadêmica. Suas competências cadastradas serão 
-                    apresentadas em filtos, para aqueles que quiserem encontrar um profissional com 
+                    ele pode apresentar suas experiências, cursos, certificações,
+                    idiomas e formação acadêmica. Suas competências cadastradas serão
+                    apresentadas em filtos, para aqueles que quiserem encontrar um profissional com
                     determinado perfil.
                 </div>
             """, unsafe_allow_html=True)
@@ -133,10 +133,10 @@ def main():
                 <div style="text-align: justify;">
                 As empresas podem buscar os melhores profissionais de acordo com os requisitos do seu
                 negócio, é possível quaisquer características na ferramenta de busca geral.
-                Além de visualizar os currículos dos profissionais buscados o 
-                <span style="color: red;">Prof</span><span style="color: black;">Hub</span> também 
+                Além de visualizar os currículos dos profissionais buscados o
+                <span style="color: red;">Prof</span><span style="color: black;">Hub</span> também
                 oferece um relatório personalizado dos profissionais que possuem mais certificações por
-                formação acadêmica.    
+                formação acadêmica.
                 </div>
             """, unsafe_allow_html=True)
 

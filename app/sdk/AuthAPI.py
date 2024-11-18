@@ -2,6 +2,7 @@ import os
 
 import requests
 
+from model.User import User
 from model.Login import Login
 from model.Register import Register
 
@@ -9,7 +10,7 @@ from model.Register import Register
 class AuthAPI:
 
     @classmethod
-    def register(cls, register: Register) -> int:
+    def register(cls, register: Register) -> User:
         data = register.model_dump()
 
         data["birthdate"] = data["birthdate"].isoformat()
@@ -28,7 +29,7 @@ class AuthAPI:
         return response.json()
 
     @classmethod
-    def login(cls, login: Login) -> int:
+    def login(cls, login: Login) -> User:
         response = requests.post(
             url=os.environ['API_URL'] + "/auth/login",
             json=login.model_dump()
