@@ -38,6 +38,49 @@ class UserPersistence(object):
 
             return data['id']
 
+    def update(self, id: int, user: dict) -> dict:
+        name = user["name"]
+        birthdate = user["starting_date"]
+        email = user["email"]
+        phone = user["phone"]
+        github = user["github"]
+
+        db = get_postgres_db()
+
+        with db.cursor() as cursor:
+            cursor.execute(
+                '''
+                    UPDATE ProfHub.User AS u
+                    SET
+                        name = %s,
+                        birthdate = %s,
+                        email = %s,
+                        phone = %s,
+                        github = %s
+                    WHERE u.id = %s;
+                ''',
+                (name, birthdate, email, phone, github, id)
+            )
+
+            user["id"] = id
+
+            return user
+
+    def delete(self, id: int):
+        db = get_postgres_db()
+
+        with db.cursor() as cursor:
+            cursor.execute(
+                '''
+                    DELETE
+                    FROM ProfHub.User AS u
+                    WHERE u.id = %s;
+                ''',
+                (id, )
+            )
+
+            return cursor.rowcount != 0
+
     def get_by_email(self, email: str) -> dict:
         db = get_postgres_db()
 
@@ -79,3 +122,19 @@ class UserPersistence(object):
                 return None
 
             return data
+
+    def search(self, query: str) -> list[dict]:
+        db = get_postgres_db()
+
+        with db.cursor() as cursor:
+            cursor.execute(
+                '''
+                    SELECT *
+                    FROM ProfHub.User AS u
+                    WHERE
+                        u.name ILIKE %(query)s
+                ''',
+                { "query": f"%{query}%" }
+            )
+
+            return cursor.fetchall()

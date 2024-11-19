@@ -1,4 +1,7 @@
 from model.User import User
+from model.Login import Login
+from model.Register import Register
+from model.UpdatePassword import UpdatePassword
 
 from model.Language import Language
 from model.LanguageKnowledge import LanguageKnowledge

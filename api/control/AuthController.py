@@ -12,6 +12,9 @@ class AuthController(object):
     def create(self, auth: Auth):
         self.persistence.auth.create(auth=auth.model_dump())
 
+    def update(self, id: int, new_hash: str):
+        return self.persistence.auth.update(id=id, new_hash=new_hash)
+
     def get_user_auth_info(self, user: User) -> Auth:
         if user.id is None or user.id == 0:
             raise Exception("AuthController received an invalid user.")

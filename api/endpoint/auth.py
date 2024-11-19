@@ -12,6 +12,7 @@ from model.Register import Register
 from model.Auth import Auth
 from model.Login import Login
 from model.User import User
+from model.UpdatePassword import UpdatePassword
 
 
 router = fastapi.APIRouter(prefix="/auth")
@@ -62,5 +63,23 @@ def login(data: Login) -> User:
 
     if werkzeug.security.check_password_hash(auth.password_hash, data.password):
         return controller.user.get_user_by_id(id=auth.uid)
+
+    raise fastapi.exceptions.HTTPException(status_code=401, detail="Wrong password")
+
+@router.post("/update-password")
+def update_password(data: UpdatePassword) -> bool:
+    controller = get_controller()
+
+    try:
+        user = controller.user.get_user_by_email(email=data.email)
+    except pydantic.ValidationError:
+        raise fastapi.exceptions.HTTPException(status_code=404, detail="Email not registered yet.")
+
+    auth = controller.auth.get_user_auth_info(user)
+
+    if werkzeug.security.check_password_hash(auth.password_hash, data.old_password):
+        new_hash = werkzeug.security.generate_password_hash(data.new_password)
+
+        return controller.auth.update(user.id, new_hash=new_hash)
 
     raise fastapi.exceptions.HTTPException(status_code=401, detail="Wrong password")

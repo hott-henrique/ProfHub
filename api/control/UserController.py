@@ -10,10 +10,24 @@ class UserController(object):
     def create(self, user: User):
         user.id = self.persistence.user.create(user=user.model_dump())
 
-    def get_user_by_email(self, email: str) -> User:
-        user_data = self.persistence.user.get_by_email(email=email)
+    def update(self, id: int, user: User) -> User:
+        user_data = self.persistence.user.update(id=id, user=user.model_dump())
         return User.model_validate(user_data)
 
-    def get_user_by_id(self, id: int) -> User:
+    def delete(self, id: int) -> bool:
+        return self.persistence.user.delete(id=id)
+
+    def get_user_by_email(self, email: str) -> User | None:
+        user_data = self.persistence.user.get_by_email(email=email)
+        return User.model_validate(user_data) if user_data else None
+
+    def get_user_by_id(self, id: int) -> User | None:
         user_data = self.persistence.user.get_by_id(id=id)
-        return User.model_validate(user_data)
+        return User.model_validate(user_data) if user_data else None
+
+    def search_by_text(self, query: str) -> list[User]:
+        return [
+            User.validate(a)
+            for a
+            in self.persistence.user.search(query=query)
+        ]

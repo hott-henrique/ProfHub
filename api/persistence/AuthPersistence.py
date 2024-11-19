@@ -22,6 +22,22 @@ class AuthPersistence(object):
                 # TODO: RAISE ERROR.
                 pass
 
+    def update(self, id: int, new_hash: str) -> bool:
+        db = get_postgres_db()
+
+        with db.cursor() as cursor:
+            cursor.execute(
+                '''
+                    UPDATE ProfHub.Auth AS a
+                    SET
+                        password_hash = %s
+                    WHERE a.id = %s;
+                ''',
+                (new_hash, id)
+            )
+
+            return cursor.rowcount != 0
+
     def get_auth_info_by_uid(self, uid: int) -> dict:
         db = get_postgres_db()
 

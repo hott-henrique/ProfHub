@@ -2,6 +2,7 @@ import os
 
 import requests
 
+from model.UpdatePassword import UpdatePassword
 from model.User import User
 from model.Login import Login
 from model.Register import Register
@@ -33,6 +34,23 @@ class AuthAPI:
         response = requests.post(
             url=os.environ['API_URL'] + "/auth/login",
             json=login.model_dump()
+        )
+
+        if not response.ok:
+            if response.status_code >= 500:
+                raise Exception("Algo de errado no servidor, por favor, contate o suporte.")
+            if response.status_code == 401:
+                raise Exception("Senha incorreta.")
+            if response.status_code == 404:
+                raise Exception("Não foi possível encontrar este usuário.")
+
+        return response.json()
+
+    @classmethod
+    def update_password(cls, update_password: UpdatePassword) -> User:
+        response = requests.post(
+            url=os.environ['API_URL'] + "/auth/update-password",
+            json=update_password.model_dump()
         )
 
         if not response.ok:
