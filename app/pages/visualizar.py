@@ -1,14 +1,19 @@
 import streamlit as st
+import time
 
 from datetime import date
 from streamlit_option_menu import option_menu
+from sdk.UserAPI import UserAPI
+from model.User import User
+from sdk.AuthAPI import AuthAPI
+from model.Login import Login
+from model.UpdatePassword import UpdatePassword
 
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
     st.sidebar.image("app/images/profhub-logo.png")
+    user = st.session_state['user'] if 'user' in st.session_state else st.switch_page("app.py")
 
-    st.sidebar.title(f"olá, {st.session_state['user']}")
-    
     with st.sidebar:
         selected = option_menu(
             menu_title=None,
@@ -23,42 +28,23 @@ def main():
             st.session_state['user'] = None
             st.switch_page("app.py")
     
-        st.chat_input(placeholder="Faça sua busca")
-    
-    st.title(st.session_state['user'], anchor=False)
-    #st.toast para cadastro de informações
+    st.title("olá, " + user['name'], anchor=False)
     
     with st.expander("Informações pessoais"):
         container = st.container(border=True, key='container-infos')
-        container.write(f"Nome: Matheus")
-        container.write("E-mail: matheus@gmail.com")
-        container.write("Github: github.com/robotheus")
-        container.write("Telefone: 31981180164")
-        container.write("Aniversário: 07/11/2003")
+        container.write(f"Nome: {user['name']}")
+        container.write(f"E-mail: {user['email']}")
+        container.write(f"Github: {user['github']}")
+        container.write(f"Telefone: {user['phone']}")
+        container.write(f"Aniversário: {user['birthdate'].split('T')[0]}")
 
-        st.button("Editar", use_container_width=True, on_click=edit_user)
-    
-    with st.expander("Experiências profissionais"):
-        #obter uma lista de experiencias
-        num_exps = 2
-        container_list = []
-
-        for exp in range(num_exps):
-            container_list.append(st.container(border=True, key="container" + str(exp)))
-        
-        for container in container_list:
-            container.write("Função: Analista de dados")
-            container.write("Cargo: Estagiário")
-            container.write("Empresa: Vexpenses")
-            container.write("Inicio: 01/2024")
-            container.write("Até: Atualmente")
-            container.write("Descrição: Analisar dados")
-            
         left, middle, right = st.columns(3, vertical_alignment="bottom")
 
-        left.button("Adicionar", key='adicionar-experiencia', use_container_width=True, on_click=add_experience)
-        middle.button("Editar", key='editar-experiencia', use_container_width=True, on_click=edit_experience)
-        right.button("Apagar", key='apagar-experiencia', use_container_width=True, on_click=rmv_experience)
+        left.button("Editar perfil", key='editar-perfil', use_container_width=True, on_click=edit_user)
+        middle.button("Alterar senha", key='alterar-senha', use_container_width=True, on_click=edit_password)
+        right.button("Apagar conta", key='apagar-conta', use_container_width=True, on_click=delete_account)
+    with st.expander("Experiências profissionais"):
+        st.write("Em breve...")
     
     with st.expander("Formação acadêmica"):
         st.write("Em breve...")
@@ -74,15 +60,102 @@ def main():
     
 @st.dialog("Editar informações pessoais")
 def edit_user():
-    #buscar valores do usuario e acrescentar em value
-    name          = st.text_input(label = "Nome", value="Matheus")
-    birthdate     = st.date_input(label = "Data de nascimento", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(2003, 11, 7))
-    email         = st.text_input(label= "E-mail", value="matheus@gmail.com")
-    phone         = st.text_input(label= "Telefone", value="31981180164")
-    github        = st.text_input(label= "Github", value="github.com/robotheus")
+    user = st.session_state['user']
+    b_data = user['birthdate'].split("T")[0].split("-")
+    
+    name          = st.text_input(label = "Nome", value=user['name'])
+    birthdate     = st.date_input(label = "Data de nascimento", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(b_data[0]), int(b_data[1]), int(b_data[2])))
+    email         = st.text_input(label= "E-mail", value=user['email'])
+    phone         = st.text_input(label= "Telefone", value=user['phone'])
+    github        = st.text_input(label= "Github", value=user['github'])
     
     editar = st.button("Atualizar", use_container_width=True, key='salvar-user')    
-    #editar informações via api
+    
+    data = {
+        "email": email,
+        "name": name,
+        "phone": phone,
+        "github": github,
+        "birthdate": birthdate
+    }
+
+    if editar:
+        try:
+            response = UserAPI.update(user['id'], User(**data))
+            st.session_state['user'] = response
+            st.success("Informações atualiadas.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f"Erro de atualização: {e}")
+        
+@st.dialog("Alterar senha")
+def edit_password():
+    user = st.session_state['user']
+
+    atual      = st.text_input(label = "Senha atual", type = "password")
+    nova       = st.text_input(label = "Nova senha", type = "password")
+    confirm    = st.text_input(label = "Confirmação de senha", type = "password")
+
+    conf = st.button("Alterar senha", key="confirm-edit-password")
+
+    data = {
+        'email' : user['email'],
+        'old_password' : atual,
+        'new_password' : nova
+    }
+
+    if conf:
+        if nova == confirm:
+            try:
+                AuthAPI.update_password(UpdatePassword(**data))
+                st.success("Senha alterada.")
+                time.sleep(2)
+                st.rerun()
+            except Exception as e:
+                st.error(f"Erro: {e}")
+        else:
+            st.error("As senhas divergem, confira.")
+
+@st.dialog("Excluir conta")
+def delete_account():
+    user = st.session_state['user']
+
+    texto      = st.text_input(label = "Digite: 'eu quero excluir minha conta :('")
+    password   = st.text_input(label = "Digite sua senha.", type = "password")
+    
+    conf = st.button("Excluir conta", key="confirm-delete-account")
+
+    data = {
+        'email' : user['email'],
+        'password' : password
+    }
+
+    if conf:
+        if texto == 'eu quero excluir minha conta :(':
+            try:
+                AuthAPI.login(Login(**data))
+                response = UserAPI.delete(user['id'])
+
+                st.success(response)
+
+                progress_text = "Apagando sua conta.. tchauu :("
+                my_bar = st.progress(0, text=progress_text)
+
+                for percent_complete in range(100):
+                    time.sleep(0.01)
+                    my_bar.progress(percent_complete + 1, text=progress_text)
+                
+                time.sleep(1)
+                my_bar.empty()
+                time.sleep(2)
+
+                
+                st.switch_page("app.py")
+            except Exception as e:
+                st.error(f"Erro: {e}")
+        else:
+            st.error("Texto incorreto, verifique.")
 
 @st.dialog("Editar experiência profissional")
 def edit_experience():

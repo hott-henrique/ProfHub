@@ -4,7 +4,6 @@ import requests
 
 from model.User import User
 
-
 class UserAPI:
 
     @classmethod
@@ -14,7 +13,7 @@ class UserAPI:
         data["birthdate"] = data["birthdate"].isoformat()
 
         response = requests.put(
-            url=f"http://localhost:8080/api/user/{id}",
+            url=os.environ['API_URL'] + f"/user/{id}",
             json=data
         )
 
@@ -27,7 +26,7 @@ class UserAPI:
     @classmethod
     def delete(cls, id: int) -> bool:
         response = requests.delete(
-            url=f"http://localhost:8080/api/user/{id}",
+            url=os.environ['API_URL'] + f"/user/{id}",
         )
 
         if not response.ok:
@@ -39,7 +38,7 @@ class UserAPI:
     @classmethod
     def search_by_text(cls, query: str) -> list[User]:
         response = requests.get(
-            url=f"http://localhost:8080/api/user/search/",
+            url=os.environ['API_URL'] + "/user/search/",
             params=dict(query=query)
         )
 

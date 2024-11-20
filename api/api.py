@@ -11,6 +11,7 @@ from api.endpoint import auth
 from api.endpoint import academic_background
 from api.endpoint import working_experience
 from api.endpoint import course
+from api.endpoint import user
 
 
 api = fastapi.FastAPI(title="ProfHub - API",
@@ -36,3 +37,4 @@ api.include_router(auth.router)
 api.include_router(academic_background.router)
 api.include_router(working_experience.router)
 api.include_router(course.router)
+api.include_router(user.router)

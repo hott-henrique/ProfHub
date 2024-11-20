@@ -9,7 +9,7 @@ from model.User import User
 
 router = fastapi.APIRouter(prefix="/user", tags=[ "User" ])
 
-@router.post("/{id}")
+@router.get("/{id}")
 def get_by_id(id: int) -> User:
     controller = get_controller()
 
@@ -27,7 +27,9 @@ def get_by_id(id: int) -> User:
 def update(id: int, user: User) -> User:
     controller = get_controller()
 
+    print(user)
     u = controller.user.update(id=id, user=user)
+    print(u)
 
     controller.commit()
 

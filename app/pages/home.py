@@ -4,9 +4,8 @@ from streamlit_option_menu import option_menu
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
     st.sidebar.image("app/images/profhub-logo.png")
+    user = st.session_state['user'] if 'user' in st.session_state else st.switch_page("app.py")
 
-    st.sidebar.title(f"olá, {st.session_state['user']}")
-    
     with st.sidebar:
         selected = option_menu(
             menu_title=None,
@@ -17,13 +16,11 @@ def main():
 
         if selected == "Visualizar currículo":
             st.switch_page("pages/visualizar.py")
-        elif selected == "Buscar avançada":
-            st.switch_page("pages/busca.py")
         elif selected == "Sair":
             st.session_state['user'] = None
             st.switch_page("app.py")
     
-        st.chat_input(placeholder="Faça sua busca")
+    st.title("olá, " + user['name'], anchor=False)
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,5 @@
 import streamlit as st
+import time
 
 from datetime import date
 from streamlit_option_menu import option_menu
@@ -6,6 +7,7 @@ from model.Register import Register
 from model.Login import Login
 from sdk.AuthAPI import AuthAPI
 from streamlit_lottie import st_lottie
+from sdk.UserAPI import UserAPI
 
 @st.dialog("Entrar")
 def login():
@@ -23,9 +25,8 @@ def login():
 
     if login_button:
         try:
-            new_login = Login(**data)
-            user_data = AuthAPI.login(new_login)
-            st.session_state['user'] = email
+            user_data = AuthAPI.login(Login(**data))
+            st.session_state['user'] = user_data
             st.switch_page("pages/home.py")
         except Exception as e:
             st.error(f"Erro de login: {e}")
@@ -38,6 +39,7 @@ def cadastro():
     phone         = st.text_input(label= "Telefone", )
     github        = st.text_input(label= "Github")
     password      = st.text_input(label = "Senha", type = "password")
+    confirm       = st.text_input(label = "Confirme a senha", type = "password")
 
     data = {
         "email": email,
@@ -51,12 +53,36 @@ def cadastro():
     submit = st.button("Cadastrar", use_container_width=True)
 
     if submit:
-        try:
-            new_user = Register(**data)
-            AuthAPI.register(new_user)
-            st.success("Usuário cadastrado com sucesso!")
-        except Exception as e:
-            st.error(f"Erro de cadastro: {e}")
+        if password == confirm:
+            try:
+                AuthAPI.register(Register(**data))
+                st.success("Usuário cadastrado com sucesso!")
+                time.sleep(2)
+                st.rerun()
+            except Exception as e:
+                st.error(f"Erro de cadastro: {e}")
+        else:
+            st.error("As senhas divergem, verifique.")
+
+@st.dialog("Busca")
+def search(prompt):
+    response = UserAPI.search_by_text(prompt)
+    num = len(response)
+    container_list = []
+
+    for exp in range(num):
+        container_list.append(st.container(border=True, key="container" + str(exp)))
+    
+    for index, container in enumerate(container_list):
+        with container:
+            c1, c2, c3 = st.columns(3, vertical_alignment="center")
+            
+            c1.write(f"{response[index]['name']}")
+            b = c3.button("Visualizar", key="button" + str(index))
+
+            if b:
+                st.session_state['view_user'] = response[index]
+                st.switch_page("pages/preview.py")
 
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
@@ -71,12 +97,14 @@ def main():
             orientation="horizontal",
         )
 
+        if selected == "Início":
+            prompt = st.chat_input(placeholder="Faça sua busca")
+            if prompt: search(prompt)
         if selected == "Login":
             login()
         elif selected == "Cadastro":
             cadastro()
 
-        st.chat_input(placeholder="Faça sua busca")
     st.title("_:red[Prof]Hub_, sua vitrine profissional ", anchor=False)
 
     col1, col2, col3 = st.tabs(['O ProfHub', 'O Profissional', 'A empresa'])

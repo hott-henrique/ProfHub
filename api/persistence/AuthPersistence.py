@@ -31,7 +31,7 @@ class AuthPersistence(object):
                     UPDATE ProfHub.Auth AS a
                     SET
                         password_hash = %s
-                    WHERE a.id = %s;
+                    WHERE a.uid = %s;
                 ''',
                 (new_hash, id)
             )

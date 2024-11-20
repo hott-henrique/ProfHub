@@ -40,7 +40,7 @@ class UserPersistence(object):
 
     def update(self, id: int, user: dict) -> dict:
         name = user["name"]
-        birthdate = user["starting_date"]
+        birthdate = user["birthdate"]
         email = user["email"]
         phone = user["phone"]
         github = user["github"]
