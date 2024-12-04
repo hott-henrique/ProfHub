@@ -15,7 +15,7 @@ class AcademicBackgroundAPI:
         data["ending_date"] = data["ending_date"].isoformat()
 
         response = requests.post(
-            url="http://localhost:8080/api/academic-background/",
+            url=os.environ['API_URL'] + "/academic-background/",
             json=data
         )
 
@@ -33,7 +33,7 @@ class AcademicBackgroundAPI:
         data["ending_date"] = data["ending_date"].isoformat()
 
         response = requests.put(
-            url=f"http://localhost:8080/api/academic-background/{id}",
+            url=os.environ['API_URL'] + f"/academic-background/{id}",
             json=data
         )
 
@@ -46,7 +46,7 @@ class AcademicBackgroundAPI:
     @classmethod
     def delete(cls, id: int) -> bool:
         response = requests.delete(
-            url=f"http://localhost:8080/api/academic-background/{id}",
+            url=os.environ['API_URL'] + f"/academic-background/{id}",
         )
 
         if not response.ok:
@@ -58,7 +58,7 @@ class AcademicBackgroundAPI:
     @classmethod
     def get_all_from_uid(cls, uid: int) -> list[AcademicBackground]:
         response = requests.get(
-            url=f"http://localhost:8080/api/academic-background/{uid}",
+            url=os.environ['API_URL'] + f"/academic-background/{uid}",
         )
 
         if not response.ok:
@@ -70,7 +70,7 @@ class AcademicBackgroundAPI:
     @classmethod
     def search_by_text(cls, query: str, education_level: EducationLevel) -> list[AcademicBackground]:
         response = requests.get(
-            url=f"http://localhost:8080/api/academic-background/search/",
+            url=os.environ['API_URL'] + "/academic-background/search/",
             params=dict(query=query, education_level=education_level)
         )
 

@@ -8,6 +8,10 @@ from model.User import User
 from sdk.AuthAPI import AuthAPI
 from model.Login import Login
 from model.UpdatePassword import UpdatePassword
+from sdk.AcademicBackgroundAPI import AcademicBackgroundAPI
+from model.AcademicBackground import AcademicBackground
+from sdk.WorkingExperienceAPI import WorkingExperienceAPI
+from model.WorkingExperience import WorkingExperience
 
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
@@ -43,11 +47,57 @@ def main():
         left.button("Editar perfil", key='editar-perfil', use_container_width=True, on_click=edit_user)
         middle.button("Alterar senha", key='alterar-senha', use_container_width=True, on_click=edit_password)
         right.button("Apagar conta", key='apagar-conta', use_container_width=True, on_click=delete_account)
-    with st.expander("Experiências profissionais"):
-        st.write("Em breve...")
     
     with st.expander("Formação acadêmica"):
-        st.write("Em breve...")
+        formations = AcademicBackgroundAPI.get_all_from_uid(user['id'])
+        formations = sorted(formations, key=lambda x: x['id']) #ordenando por id, pode ficar lento..
+        num = len(formations)
+        container_list = []
+
+        for form in range(num):
+            container_list.append(st.container(border=True, key="container-avan" + str(form)))
+        
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(formations[index]['name'])
+                st.write(f"Instituição: {formations[index]['institution']}")
+                st.write(f"Início: {formations[index]['starting_date'].split('T')[0]}")
+                st.write(f"Até: {formations[index]['ending_date'].split('T')[0]}")
+                st.write(f"Carga horária: {formations[index]['workload']}")
+                st.write(f"Nível: {formations[index]['level']}")
+                st.write(f"Descrição: {formations[index]['description']}")
+
+                left, right = st.columns(2, vertical_alignment="bottom")
+
+                left.button("Editar formação", key=f'editar-form-{index}', use_container_width=True, on_click=edit_formation, args=(formations[index]['id'], formations[index]))
+                right.button("Apagar formação", key=f'apagar-form-{index}', use_container_width=True, on_click=delete_formation, args=(formations[index]['id'], formations[index]))
+        
+        st.button("Adicionar formação", key='adicionar-form', use_container_width=True, on_click=add_formation)
+        
+    with st.expander("Experiências profissionais"):
+        xp = WorkingExperienceAPI.get_all_from_uid(user['id'])
+    
+        num = len(xp)
+        
+        container_list = []
+
+        for exp in range(num):
+            container_list.append(st.container(border=True, key="container-xp" + str(exp)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Cargo: {xp[index]['job']}")
+                st.write(f"Empresa: {xp[index]['company'].split('T')[0]}")
+                st.write(f"Início: {xp[index]['starting_date'].split('T')[0]}")
+                st.write(f"Fim: {xp[index]['ending_date'].split('T')[0]}")
+                st.write(f"Descrição: {xp[index]['description']}")
+
+                left, right = st.columns(2, vertical_alignment="bottom")
+
+                left.button("Editar experiência", key=f'editar-xp-{index}', use_container_width=True, on_click=edit_xp, args=(xp[index]['id'], xp[index]))
+                right.button("Apagar experiência", key=f'apagar-xp-{index}', use_container_width=True, on_click=delete_xp, args=(xp[index]['id'], xp[index]))
+        
+        st.button("Adicionar formação", key='adicionar-xp', use_container_width=True, on_click=add_xp, args=(user, ))
     
     with st.expander("Cursos"):
         st.write("Em breve...")
@@ -157,41 +207,163 @@ def delete_account():
         else:
             st.error("Texto incorreto, verifique.")
 
-@st.dialog("Editar experiência profissional")
-def edit_experience():
-    #buscar valores do usuario e acrescentar em value
-    função = st.text_input(label = "Função", value="Analista de dados")
-    cargo = st.text_input(label = "Cargo", value="Estagiario")
-    empresa = st.text_input(label = "Empresa", value="Vexpenses")
-    inicio = st.date_input(label = "Início", min_value=date(1900, 1, 1), value=date(2024, 1, 1))
-    ate = st.date_input(label = "Até", min_value=date(1900, 1, 1))
-    descricao = st.text_area(label="Descrição", value="analistar dados, etc, etc")
+@st.dialog("Adicionar formação acadêmica")
+def add_formation():
+    name = st.text_input(label = "Nome")
+    institution = st.text_input(label = "Instituição")
+    s_date = st.date_input(label = "Início", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
+    e_date = st.date_input(label = "Fim ou Previsão", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
+    workload = st.number_input(label  = "Carga horária", step=100)
+    description = st.text_area(label = "Descrição", max_chars=300)
+    levels = ['Técnico', 'Graduação', 'Pós-graduação', 'Mestrado', 'Doutorado', 'Pós-doutorado']
+    mapa = {'Técnico' : 'technical', 'Graduação' : 'undergraduate', 'Pós-graduação' : 'postgraduate', 
+            'Mestrado': 'master', 'Doutorado': 'doctorate', 'Pós-doutorado': 'postdoctorate'}
+    level = st.selectbox(label = "Nível", options=levels)
+    level_o = mapa[level]
+
+    data = {
+        'uid': st.session_state['user']['id'],
+        'name': name,
+        'institution': institution,
+        'starting_date': s_date,
+        'ending_date': e_date,
+        'workload': workload,
+        'description': description,
+        'level': level_o
+    }
+
+    add = st.button("Adicionar", use_container_width=True, key='add-form-button') 
+
+    if add:
+        try:
+            AcademicBackgroundAPI.create(AcademicBackground(**data))
+            st.success("Formação adicionada.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+            
+@st.dialog("Editar formação acadêmica")
+def edit_formation(arg1, arg2):
+    sta_data = arg2['starting_date'].split("T")[0].split("-")
+    end_data = arg2['ending_date'].split("T")[0].split("-")
+
+    name = st.text_input(label = "Nome", value=arg2['name'])
+    institution = st.text_input(label = "Instituição", value=arg2['institution'])
+    s_date = st.date_input(label = "Início", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(sta_data[0]), int(sta_data[1]), int(sta_data[2])))
+    e_date = st.date_input(label = "Fim ou Previsão", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(end_data[0]), int(end_data[1]), int(end_data[2])))
+    workload = st.number_input(label  = "Carga horária", step=100, value=arg2['workload'])
+    description = st.text_area(label = "Descrição", max_chars=300, value=arg2['description'])
     
-    editar = st.button("Atualizar", use_container_width=True, key='editar-exp')
-    #editar informações via api
+    levels = ['Técnico', 'Graduação', 'Pós-graduação', 'Mestrado', 'Doutorado', 'Pós-doutorado']
+    mapa = {'Técnico' : 'technical', 'Graduação' : 'undergraduate', 'Pós-graduação' : 'postgraduate', 
+            'Mestrado': 'master', 'Doutorado': 'doctorate', 'Pós-doutorado': 'postdoctorate'}
+    chave = [key for key, value in mapa.items() if value == arg2['level']][0]
+    indice = levels.index(chave)
+
+    level = st.selectbox(label = "Nível", options=levels, index=indice)
+    level_o = mapa[level]
+
+    data = {
+        'uid': st.session_state['user']['id'],
+        'name': name,
+        'institution': institution,
+        'starting_date': s_date,
+        'ending_date': e_date,
+        'workload': workload,
+        'description': description,
+        'level': level_o
+    }
+
+    att = st.button("Atualizar", use_container_width=True, key='att-form-button') 
+
+    if att:
+        try:
+            AcademicBackgroundAPI.update(arg1, AcademicBackground(**data))
+            st.success("Formação atualizada.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Remover formação acadêmica")
+def delete_formation(arg1, arg2):
+    confirm = st.button("Confirmar exclusão da formação acadêmica.", use_container_width=True)
+
+    if confirm:
+        AcademicBackgroundAPI.delete(arg1)
+        st.success("Formação removida.")
+        time.sleep(2)
+        st.rerun()
 
 @st.dialog("Adicionar experiência profissional")
-def add_experience():
-    #buscar valores do usuario e acrescentar em value
-    função = st.text_input(label = "Função")
-    cargo = st.text_input(label = "Cargo")
-    empresa = st.text_input(label = "Empresa")
-    inicio = st.date_input(label = "Início", min_value=date(1900, 1, 1))
-    ate = st.date_input(label = "Até", min_value=date(1900, 1, 1))
-    descricao = st.text_area(label="Descrição")
+def add_xp(user):
+    job = st.text_input(label = "Cargo", max_chars=32)
+    company = st.text_input(label = "Empresa", max_chars=128)
+    s_date = st.date_input(label = "Início", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
+    e_date = st.date_input(label = "Fim", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
+    description = st.text_area(label = "Descrição", max_chars=300)
     
-    adicionar = st.button("Adicionar", use_container_width=True, key='add-exp')
-    #adicionar informações via api
+    data = {
+        'uid': user['id'],
+        'job': job,
+        'company': company,
+        'starting_date': s_date,
+        'ending_date': e_date,
+        'description': description,
+    }
 
-@st.dialog("Remover experiência profissional")
-def rmv_experience():
-    #pegar a lista de experiencias por nome da empresa
-    exps = ['exp1', 'exp2', 'exp3']
+    add = st.button("Adicionar", use_container_width=True, key='add-xp-button') 
+
+    if add:
+        try:
+            WorkingExperienceAPI.create(WorkingExperience(**data))
+            st.success("Experiência profissional adicionada.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Editar experiência profissional")
+def edit_xp(id, xp):
+    sta_data = xp['starting_date'].split("T")[0].split("-")
+    end_data = xp['ending_date'].split("T")[0].split("-")
+
+    job = st.text_input(label = "Cargo", value=xp['job'])
+    company = st.text_input(label = "Empresa", value=xp['company'])
+    s_date = st.date_input(label = "Início", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(sta_data[0]), int(sta_data[1]), int(sta_data[2])))
+    e_date = st.date_input(label = "Fim", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(end_data[0]), int(end_data[1]), int(end_data[2])))
+    description = st.text_area(label = "Descrição", max_chars=300, value=xp['description'])
     
-    selects = st.multiselect(label="Selecione as experiências", options=exps, default=None)
-    
-    remover = st.button("Remover", use_container_width=True, key='remover-exp')
-    #remover informações via api
+    data = {
+        'uid': st.session_state['user']['id'],
+        'job': job,
+        'company': company,
+        'starting_date': s_date,
+        'ending_date': e_date,
+        'description': description,
+    }
+
+    att = st.button("Atualizar", use_container_width=True, key='att-xp-button') 
+
+    if att:
+        try:
+            WorkingExperienceAPI.update(id, WorkingExperience(**data))
+            st.success("Experiência profissional atualizada.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Remover experiência profisisonal")
+def delete_xp(arg1, arg2):
+    confirm = st.button("Confirmar exclusão da experiência profissional.", use_container_width=True)
+
+    if confirm:
+        WorkingExperienceAPI.delete(arg1)
+        st.success("Experiência removida.")
+        time.sleep(2)
+        st.rerun()
 
 if __name__ == "__main__":
     main()

@@ -48,7 +48,7 @@ class WorkingExperiencePersistence(object):
                         starting_date = %s,
                         ending_date = %s,
                         description = %s
-                    WHERE a.id = %s;
+                    WHERE w.id = %s;
                 ''',
                 (uid, job, company, starting_date, ending_date, description, id)
             )
@@ -78,7 +78,7 @@ class WorkingExperiencePersistence(object):
                 '''
                     SELECT *
                     FROM ProfHub.WorkingExperience AS w
-                    WHERE a.uid = %s;
+                    WHERE w.uid = %s;
                 ''',
                 (uid, )
             )

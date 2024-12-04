@@ -15,7 +15,7 @@ class WorkingExperienceAPI:
         data["ending_date"] = data["ending_date"].isoformat()
 
         response = requests.post(
-            url="http://localhost:8080/api/working-experience/",
+            url=os.environ['API_URL'] + "/working-experience/",
             json=data
         )
 
@@ -33,7 +33,7 @@ class WorkingExperienceAPI:
         data["ending_date"] = data["ending_date"].isoformat()
 
         response = requests.put(
-            url=f"http://localhost:8080/api/working-experience/{id}",
+            url=os.environ['API_URL'] + f"/working-experience/{id}",
             json=data
         )
 
@@ -46,7 +46,7 @@ class WorkingExperienceAPI:
     @classmethod
     def delete(cls, id: int) -> bool:
         response = requests.delete(
-            url=f"http://localhost:8080/api/working-experience/{id}",
+            url=os.environ['API_URL'] + f"/working-experience/{id}",
         )
 
         if not response.ok:
@@ -58,9 +58,9 @@ class WorkingExperienceAPI:
     @classmethod
     def get_all_from_uid(cls, uid: int) -> list[WorkingExperience]:
         response = requests.get(
-            url=f"http://localhost:8080/api/working-experience/{uid}",
+            url=os.environ['API_URL'] + f"/working-experience/{uid}",
         )
-
+    
         if not response.ok:
             if response.status_code >= 500:
                 raise Exception("Algo de errado no servidor, por favor, contate o suporte.")
@@ -70,7 +70,7 @@ class WorkingExperienceAPI:
     @classmethod
     def search_by_text(cls, query: str) -> list[WorkingExperience]:
         response = requests.get(
-            url=f"http://localhost:8080/api/working-experience/search/",
+            url=os.environ['API_URL'] + "/working-experience/search/",
             params=dict(query=query)
         )
 
