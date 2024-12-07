@@ -4,6 +4,7 @@ from api.persistence.AcademicBackgroundPersistence import AcademicBackgroundPers
 from api.persistence.WorkingExperiencePersistence import WorkingExperiencePersistence
 from api.persistence.CoursePersistence import CoursePersistence
 from api.persistence.CertificatePersistence import CertificatePersistence
+from api.persistence.LanguageKnowledgePersistence import LanguageKnowledgePersistence
 
 from api.persistence.connector import get_postgres_db
 
@@ -17,6 +18,7 @@ class CentralPersistence(object):
         self.working_experience = WorkingExperiencePersistence()
         self.course = CoursePersistence()
         self.certificate = CertificatePersistence()
+        self.language_knowledge = LanguageKnowledgePersistence()
 
     def commit(self):
         get_postgres_db().commit()

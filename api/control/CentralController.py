@@ -6,6 +6,7 @@ from api.control.AcademicBackgroundController import AcademicBackgroundControlle
 from api.control.WorkingExperienceController import WorkingExperienceController
 from api.control.CourseController import CourseController
 from api.control.CertificateController import CertificateController
+from api.control.LanguageKnowledgeController import LanguageKnowledgeController
 
 
 class CentralController(object):
@@ -18,6 +19,7 @@ class CentralController(object):
         self.working_experience = WorkingExperienceController(persistence=self.persistence)
         self.course = CourseController(persistence=self.persistence)
         self.certificate = CertificateController(persistence=self.persistence)
+        self.language_knowledge = LanguageKnowledgeController(persistence=self.persistence)
 
     def commit(self):
         self.persistence.commit()
