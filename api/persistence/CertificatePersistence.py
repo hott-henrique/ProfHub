@@ -1,53 +1,53 @@
 from api.persistence.connector import get_postgres_db
 
 
-class CoursePersistence(object):
+class CertificatePersistence(object):
 
-    def create(self, course: dict) -> int | None:
-        uid = course["uid"]
-        name = course["name"]
-        date = course["starting_date"]
-        workload = course["workload"]
-        description = course["description"]
+    def create(self, certificate: dict) -> int | None:
+        uid = certificate["uid"]
+        name = certificate["name"]
+        date = certificate["date"]
+        validation_key = certificate["validation_key"]
+        expire_date = certificate["expire_date"]
 
         db = get_postgres_db()
 
         with db.cursor() as cursor:
             cursor.execute(
                 '''
-                    INSERT INTO ProfHub.Course(uid, name, date, workload, description)
+                    INSERT INTO ProfHub.Certificate(uid, name, date, validation_key, expire_date)
                    	VALUES (%s, %s, %s, %s, %s)
                     RETURNING id;
                 ''',
-                (uid, name, date, workload, description)
+                (uid, name, date, validation_key, expire_date)
             )
 
             data: dict = cursor.fetchone()
 
             return data['id'] if data else None
 
-    def update(self, id: int, course: dict):
-        uid = course["uid"]
-        name = course["name"]
-        date = course["starting_date"]
-        workload = course["workload"]
-        description = course["description"]
+    def update(self, id: int, certificate: dict):
+        uid = certificate["uid"]
+        name = certificate["name"]
+        date = certificate["date"]
+        validation_key = certificate["validation_key"]
+        expire_date = certificate["expire_date"]
 
         db = get_postgres_db()
 
         with db.cursor() as cursor:
             cursor.execute(
                 '''
-                    UPDATE ProfHub.Course AS a
+                    UPDATE ProfHub.Certificate AS c
                     SET
                         uid = %s,
                         name = %s,
                         date = %s,
-                        workload = %s,
-                        description = %s
-                    WHERE a.id = %s;
+                        validation_key = %s,
+                        expire_date = %s
+                    WHERE c.id = %s;
                 ''',
-                (uid, name, date, workload, description, id)
+                (uid, name, date, validation_key, expire_date, id)
             )
 
             return cursor.rowcount != 0
@@ -59,7 +59,7 @@ class CoursePersistence(object):
             cursor.execute(
                 '''
                     DELETE
-                    FROM ProfHub.Course AS c
+                    FROM ProfHub.Certificate AS c
                     WHERE c.id = %s;
                 ''',
                 (id, )
@@ -74,7 +74,7 @@ class CoursePersistence(object):
             cursor.execute(
                 '''
                     SELECT *
-                    FROM ProfHub.Course AS c
+                    FROM ProfHub.Certificate AS c
                     WHERE c.uid = %s;
                 ''',
                 (uid, )
@@ -89,11 +89,9 @@ class CoursePersistence(object):
             cursor.execute(
                 '''
                     SELECT *
-                    FROM ProfHub.Course AS c
+                    FROM ProfHub.Certificate AS c
                     WHERE
                         c.name ILIKE %(query)s
-                        OR
-                        c.description ILIKE %(query)s
                 ''',
                 { "query": f"%{query}%" }
             )

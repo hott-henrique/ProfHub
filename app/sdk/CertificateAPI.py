@@ -2,19 +2,19 @@ import os
 
 import requests
 
-from model.Course import Course
+from model.Certificate import Certificate
 
 
-class CourseAPI:
+class CertificateAPI:
 
     @classmethod
-    def create(cls, course: Course) -> int:
-        data = course.model_dump()
+    def create(cls, certificate: Certificate) -> int:
+        data = certificate.model_dump()
 
         data["date"] = data["date"].isoformat()
 
         response = requests.post(
-            url=os.environ['API_URL'] + "/api/course/",
+            url=os.environ['API_URL'] + "/api/certificate/",
             json=data
         )
 
@@ -25,13 +25,13 @@ class CourseAPI:
         return response.json()
 
     @classmethod
-    def update(cls, id: int, course: Course) -> bool:
-        data = course.model_dump()
+    def update(cls, id: int, certificate: Certificate) -> bool:
+        data = certificate.model_dump()
 
         data["date"] = data["date"].isoformat()
 
         response = requests.put(
-            url=os.environ['API_URL'] + f"/api/course/{id}",
+            url=os.environ['API_URL'] + f"/api/certificate/{id}",
             json=data
         )
 
@@ -44,7 +44,7 @@ class CourseAPI:
     @classmethod
     def delete(cls, id: int) -> bool:
         response = requests.delete(
-            url=os.environ['API_URL'] +f"/api/course/{id}",
+            url=os.environ['API_URL'] +f"/api/certificate/{id}",
         )
 
         if not response.ok:
@@ -54,9 +54,9 @@ class CourseAPI:
         return response.json()
 
     @classmethod
-    def get_all_from_uid(cls, uid: int) -> list[Course]:
+    def get_all_from_uid(cls, uid: int) -> list[Certificate]:
         response = requests.get(
-            url=os.environ['API_URL'] +f"/api/course/{uid}",
+            url=os.environ['API_URL'] +f"/api/certificate/{uid}",
         )
 
         if not response.ok:
@@ -66,9 +66,9 @@ class CourseAPI:
         return response.json()
 
     @classmethod
-    def search_by_text(cls, query: str) -> list[Course]:
+    def search_by_text(cls, query: str) -> list[Certificate]:
         response = requests.get(
-            url=os.environ['API_URL'] +"/api/course/search/",
+            url=os.environ['API_URL'] +"/api/certificate/search/",
             params=dict(query=query)
         )
 
