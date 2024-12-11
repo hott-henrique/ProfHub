@@ -8,6 +8,7 @@ from model.Login import Login
 from sdk.AuthAPI import AuthAPI
 from streamlit_lottie import st_lottie
 from sdk.UserAPI import UserAPI
+from sdk.CourseAPI import CourseAPI
 
 @st.dialog("Entrar")
 def login():
@@ -72,11 +73,11 @@ def search(prompt):
 
     for exp in range(num):
         container_list.append(st.container(border=True, key="container" + str(exp)))
-    
+
     for index, container in enumerate(container_list):
         with container:
             c1, c2, c3 = st.columns(3, vertical_alignment="center")
-            
+
             c1.write(f"{response[index]['name']}")
             b = c3.button("Visualizar", key="button" + str(index))
 

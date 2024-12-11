@@ -27,9 +27,7 @@ def get_by_id(id: int) -> User:
 def update(id: int, user: User) -> User:
     controller = get_controller()
 
-    print(user)
     u = controller.user.update(id=id, user=user)
-    print(u)
 
     controller.commit()
 
@@ -50,3 +48,13 @@ def search_by_text(query: str) -> list[User]:
     controller = get_controller()
 
     return controller.user.search_by_text(query=query)
+
+@router.get("/most-certified/{academic_background}")
+def most_certified_professionals(academic_background: str, page: int = 0, page_sz: int = 10) -> list[tuple[int, int]]:
+    controller = get_controller()
+
+    return controller.user.get_most_certified_professionals_by_academic_background(
+        academic_background=academic_background,
+        page=page,
+        page_sz=page_sz
+    )

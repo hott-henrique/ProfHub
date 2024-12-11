@@ -14,7 +14,7 @@ class CourseAPI:
         data["date"] = data["date"].isoformat()
 
         response = requests.post(
-            url=os.environ['API_URL'] + "/api/course/",
+            url=os.environ['API_URL'] + "/course/",
             json=data
         )
 
@@ -31,7 +31,7 @@ class CourseAPI:
         data["date"] = data["date"].isoformat()
 
         response = requests.put(
-            url=os.environ['API_URL'] + f"/api/course/{id}",
+            url=os.environ['API_URL'] + f"/course/{id}",
             json=data
         )
 
@@ -44,7 +44,7 @@ class CourseAPI:
     @classmethod
     def delete(cls, id: int) -> bool:
         response = requests.delete(
-            url=os.environ['API_URL'] +f"/api/course/{id}",
+            url=os.environ['API_URL'] +f"/course/{id}",
         )
 
         if not response.ok:
@@ -56,7 +56,7 @@ class CourseAPI:
     @classmethod
     def get_all_from_uid(cls, uid: int) -> list[Course]:
         response = requests.get(
-            url=os.environ['API_URL'] +f"/api/course/{uid}",
+            url=os.environ['API_URL'] +f"/course/{uid}",
         )
 
         if not response.ok:
@@ -68,7 +68,7 @@ class CourseAPI:
     @classmethod
     def search_by_text(cls, query: str) -> list[Course]:
         response = requests.get(
-            url=os.environ['API_URL'] +"/api/course/search/",
+            url=os.environ['API_URL'] +"/course/search/",
             params=dict(query=query)
         )
 

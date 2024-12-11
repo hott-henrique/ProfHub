@@ -14,7 +14,7 @@ class CertificateAPI:
         data["date"] = data["date"].isoformat()
 
         response = requests.post(
-            url=os.environ['API_URL'] + "/api/certificate/",
+            url=os.environ['API_URL'] + "/certificate/",
             json=data
         )
 
@@ -31,7 +31,7 @@ class CertificateAPI:
         data["date"] = data["date"].isoformat()
 
         response = requests.put(
-            url=os.environ['API_URL'] + f"/api/certificate/{id}",
+            url=os.environ['API_URL'] + f"/certificate/{id}",
             json=data
         )
 
@@ -44,7 +44,7 @@ class CertificateAPI:
     @classmethod
     def delete(cls, id: int) -> bool:
         response = requests.delete(
-            url=os.environ['API_URL'] +f"/api/certificate/{id}",
+            url=os.environ['API_URL'] +f"/certificate/{id}",
         )
 
         if not response.ok:
@@ -56,7 +56,7 @@ class CertificateAPI:
     @classmethod
     def get_all_from_uid(cls, uid: int) -> list[Certificate]:
         response = requests.get(
-            url=os.environ['API_URL'] +f"/api/certificate/{uid}",
+            url=os.environ['API_URL'] +f"/certificate/{uid}",
         )
 
         if not response.ok:
@@ -68,7 +68,7 @@ class CertificateAPI:
     @classmethod
     def search_by_text(cls, query: str) -> list[Certificate]:
         response = requests.get(
-            url=os.environ['API_URL'] +"/api/certificate/search/",
+            url=os.environ['API_URL'] +"/certificate/search/",
             params=dict(query=query)
         )
 
