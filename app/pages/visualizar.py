@@ -12,6 +12,10 @@ from sdk.AcademicBackgroundAPI import AcademicBackgroundAPI
 from model.AcademicBackground import AcademicBackground
 from sdk.WorkingExperienceAPI import WorkingExperienceAPI
 from model.WorkingExperience import WorkingExperience
+from model.Course import Course
+from sdk.CourseAPI import CourseAPI
+from model.Certificate import Certificate
+from sdk.CertificateAPI import CertificateAPI
 
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
@@ -76,9 +80,7 @@ def main():
         
     with st.expander("Experiências profissionais"):
         xp = WorkingExperienceAPI.get_all_from_uid(user['id'])
-    
         num = len(xp)
-        
         container_list = []
 
         for exp in range(num):
@@ -87,7 +89,7 @@ def main():
         for index, container in enumerate(container_list):
             with container:
                 st.write(f"Cargo: {xp[index]['job']}")
-                st.write(f"Empresa: {xp[index]['company'].split('T')[0]}")
+                st.write(f"Empresa: {xp[index]['company']}")
                 st.write(f"Início: {xp[index]['starting_date'].split('T')[0]}")
                 st.write(f"Fim: {xp[index]['ending_date'].split('T')[0]}")
                 st.write(f"Descrição: {xp[index]['description']}")
@@ -97,13 +99,53 @@ def main():
                 left.button("Editar experiência", key=f'editar-xp-{index}', use_container_width=True, on_click=edit_xp, args=(xp[index]['id'], xp[index]))
                 right.button("Apagar experiência", key=f'apagar-xp-{index}', use_container_width=True, on_click=delete_xp, args=(xp[index]['id'], xp[index]))
         
-        st.button("Adicionar formação", key='adicionar-xp', use_container_width=True, on_click=add_xp, args=(user, ))
+        st.button("Adicionar experiência", key='adicionar-xp', use_container_width=True, on_click=add_xp, args=(user, ))
     
     with st.expander("Cursos"):
-        st.write("Em breve...")
+        cou = CourseAPI.get_all_from_uid(user['id'])
+        st.success(cou)
+
+        num = len(cou)
+        container_list = []
+
+        for caaa in range(num):
+            container_list.append(st.container(border=True, key="container-course" + str(caaa)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Nome: {cou[index]['name']}")
+                st.write(f"Workload: {cou[index]['workload']}")
+                st.write(f"Data: {cou[index]['date'].split('T')[0]}")
+                st.write(f"Descrição: {cou[index]['description']}")
+
+                left, right = st.columns(2, vertical_alignment="bottom")
+
+                left.button("Editar curso", key=f'editar-c-{index}', use_container_width=True, on_click=edit_course, args=(cou[index], ))
+                right.button("Apagar curso", key=f'apagar-c-{index}', use_container_width=True, on_click=delete_course, args=(cou[index], ))
+    
+        st.button("Adicionar curso", key='add-course', use_container_width=True, on_click=add_course, args=(user['id'], ))
     
     with st.expander("Certificações"):
-        st.write("Em breve...")
+        cert = CertificateAPI.get_all_from_uid(user['id'])
+        num = len(cert)
+        container_list = []
+
+        for c in range(num):
+            container_list.append(st.container(border=True, key="container-cert" + str(c)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Nome: {cert[index]['name']}")
+                st.write(f"Chave para validação: {cert[index]['workload']}")
+                st.write(f"Data da obtenção: {cert[index]['date'].split('T')[0]}")
+                st.write(f"Expira em: {cert[index]['date'].split('T')[0]}")
+
+                left, right = st.columns(2, vertical_alignment="bottom")
+
+                left.button("Editar certificação", key=f'editar-cer-{index}', use_container_width=True, on_click=edit_cert, args=(cert[index], ))
+                right.button("Apagar certificação", key=f'apagar-cer-{index}', use_container_width=True, on_click=delete_cert, args=(cert[index], ))
+        
+        st.button("Adicionar curso", key='add-cert', use_container_width=True, on_click=add_cert, args=(user['id'], ))
 
     with st.expander("Idiomas"):
         st.write("Em breve...")
@@ -364,6 +406,136 @@ def delete_xp(arg1, arg2):
         st.success("Experiência removida.")
         time.sleep(2)
         st.rerun()
+
+@st.dialog("Adicionar curso")
+def add_course(id):
+    name = st.text_input(label = "Nome", max_chars=32)
+    carga = st.text_input(label = "Carga horária", max_chars=128)
+    s_date = st.date_input(label = "Data", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
+    description = st.text_area(label = "Descrição", max_chars=300)
+    
+    data = {
+        'uid': id,
+        'name': name,
+        'workload': carga,
+        'date': s_date,
+        'description': description,
+    }
+
+    add = st.button("Adicionar", use_container_width=True, key='add-course-button') 
+
+    if add:
+        try:
+            CourseAPI.create(Course(**data))
+            st.success("Curso adicionado.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Editar curso")
+def edit_course(course):
+    sta_data = course['date'].split("T")[0].split("-")
+    
+    name = st.text_input(label = "Nome", max_chars=32, value=course['name'])
+    carga = st.text_input(label = "Carga horária", max_chars=128,value=course['workload'])
+    s_date = st.date_input(label = "Data", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(sta_data[0]), int(sta_data[1]), int(sta_data[2])))
+    description = st.text_area(label = "Descrição", max_chars=300)
+    
+    data = {
+        'uid': course['id'],
+        'name': name,
+        'workload': carga,
+        'date': s_date,
+        'description': description,
+    }
+
+    att = st.button("Atualizar", use_container_width=True, key='att-course-button') 
+
+    if att:
+        try:
+            CourseAPI.update(course['id'], Course(**data))
+            st.success("Curso atualizado.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Excluir curso")
+def delete_course(course):
+    confirm = st.button("Confirmar exclusão do curso.", use_container_width=True)
+
+    if confirm:
+        CourseAPI.delete(course['id'])
+        st.success("Curso removido.")
+        time.sleep(2)
+        st.rerun()
+
+@st.dialog("Adicionar certificação")
+def add_cert(id):
+    name = st.text_input(label = "Nome", max_chars=32)
+    key = st.text_input(label = "Chave de validação", max_chars=128)
+    date = st.date_input(label = "Data", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
+    expire_date = st.date_input(label = "Expira", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
+    
+    data = {
+        'uid': id,
+        'name': name,
+        'validation_key': key,
+        'date': date,
+        'expire_date': expire_date,
+    }
+
+    add = st.button("Adicionar", use_container_width=True, key='add-cert-button') 
+
+    if add:
+        try:
+            CertificateAPI.create(Certificate(**data))
+            st.success("Certificação adicionada.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Editar certificação")
+def edit_cert(cert):
+    sta_data = cert['date'].split("T")[0].split("-")
+    sta_data2 = cert['expire_date'].split("T")[0].split("-")
+
+    name = st.text_input(label = "Nome", max_chars=32, value=cert['name'])
+    validation_key = st.text_input(label = "Chave de validação", max_chars=128,value=cert['validation_key'])
+    s_date = st.date_input(label = "Data", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(sta_data[0]), int(sta_data[1]), int(sta_data[2])))
+    expire_date = st.date_input(label = "Expira", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(sta_data2[0]), int(sta_data2[1]), int(sta_data2[2])))
+    
+    data = {
+        'uid': cert['id'],
+        'name': name,
+        'validation_key': validation_key,
+        'date': s_date,
+        'expire_date': expire_date,
+    }
+
+    att = st.button("Atualizar", use_container_width=True, key='att-cert-button') 
+
+    if att:
+        try:
+            CertificateAPI.update(cert['id'], CertificateAPI(**data))
+            st.success("Certificação atualizada.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Remover certificação")
+def delete_cert(cert):
+    confirm = st.button("Confirmar exclusão da certificação.", use_container_width=True)
+
+    if confirm:
+        CertificateAPI.delete(cert['id'])
+        st.success("Certificação removido.")
+        time.sleep(2)
+        st.rerun()
+
 
 if __name__ == "__main__":
     main()

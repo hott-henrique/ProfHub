@@ -56,7 +56,7 @@ class CourseAPI:
     @classmethod
     def get_all_from_uid(cls, uid: int) -> list[Course]:
         response = requests.get(
-            url=os.environ['API_URL'] +f"/api/course/{uid}",
+            url=os.environ['API_URL'] + f"/api/course/{uid}",
         )
 
         if not response.ok:
