@@ -138,3 +138,26 @@ class UserPersistence(object):
             )
 
             return cursor.fetchall()
+
+    def get_most_certified_professionals_by_academic_background(self, academic_background: str, page_sz: int, page: int) -> list[tuple[int, int]]:
+        db = get_postgres_db()
+
+        with db.cursor() as cursor:
+            cursor.execute(
+                '''
+                    SELECT u.id, gp.count
+                    FROM
+                        ProfHub.User as u
+                        JOIN
+                        (SELECT c.uid, COUNT(c.uid)
+                         FROM ProfHub.Certificate AS c
+                         GROUP BY c.uid) AS gp
+                    ON u.id = gp.uid
+                    WHERE u.id IN (SELECT DISTINCT uid FROM ProfHub.AcademicBackground as a WHERE a.name = %s)
+                    ORDER BY gp.count DESC
+                    LIMIT %s OFFSET %s;
+                ''',
+                (academic_background, page_sz, page * page_sz)
+            )
+
+            return cursor.fetchall()

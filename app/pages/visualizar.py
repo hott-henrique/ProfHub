@@ -54,7 +54,8 @@ def main():
     
     with st.expander("Formação acadêmica"):
         formations = AcademicBackgroundAPI.get_all_from_uid(user['id'])
-        formations = sorted(formations, key=lambda x: x['id']) #ordenando por id, pode ficar lento..
+        formations = sorted(formations, key=lambda x: x['id']) #ordernar por id
+        
         num = len(formations)
         container_list = []
 
@@ -80,6 +81,8 @@ def main():
         
     with st.expander("Experiências profissionais"):
         xp = WorkingExperienceAPI.get_all_from_uid(user['id'])
+        xp = sorted(xp, key=lambda x: x['id']) #ordenar por id
+
         num = len(xp)
         container_list = []
 
@@ -103,7 +106,7 @@ def main():
     
     with st.expander("Cursos"):
         cou = CourseAPI.get_all_from_uid(user['id'])
-        st.success(cou)
+        cou = sorted(cou, key=lambda x: x['id']) #ordenando por id
 
         num = len(cou)
         container_list = []
@@ -127,6 +130,7 @@ def main():
     
     with st.expander("Certificações"):
         cert = CertificateAPI.get_all_from_uid(user['id'])
+        cert = sorted(cert, key=lambda x: x['id']) #ordenando por id
         num = len(cert)
         container_list = []
 
@@ -136,7 +140,7 @@ def main():
         for index, container in enumerate(container_list):
             with container:
                 st.write(f"Nome: {cert[index]['name']}")
-                st.write(f"Chave para validação: {cert[index]['workload']}")
+                st.write(f"Chave para validação: {cert[index]['validation_key']}")
                 st.write(f"Data da obtenção: {cert[index]['date'].split('T')[0]}")
                 st.write(f"Expira em: {cert[index]['date'].split('T')[0]}")
 
@@ -145,7 +149,7 @@ def main():
                 left.button("Editar certificação", key=f'editar-cer-{index}', use_container_width=True, on_click=edit_cert, args=(cert[index], ))
                 right.button("Apagar certificação", key=f'apagar-cer-{index}', use_container_width=True, on_click=delete_cert, args=(cert[index], ))
         
-        st.button("Adicionar curso", key='add-cert', use_container_width=True, on_click=add_cert, args=(user['id'], ))
+        st.button("Adicionar certificação", key='add-cert', use_container_width=True, on_click=add_cert, args=(user['id'], ))
 
     with st.expander("Idiomas"):
         st.write("Em breve...")
@@ -408,14 +412,14 @@ def delete_xp(arg1, arg2):
         st.rerun()
 
 @st.dialog("Adicionar curso")
-def add_course(id):
+def add_course(id_user):
     name = st.text_input(label = "Nome", max_chars=32)
-    carga = st.text_input(label = "Carga horária", max_chars=128)
+    carga = st.number_input(label = "Carga horária", step=100)
     s_date = st.date_input(label = "Data", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
     description = st.text_area(label = "Descrição", max_chars=300)
     
     data = {
-        'uid': id,
+        'uid': id_user,
         'name': name,
         'workload': carga,
         'date': s_date,
@@ -438,12 +442,12 @@ def edit_course(course):
     sta_data = course['date'].split("T")[0].split("-")
     
     name = st.text_input(label = "Nome", max_chars=32, value=course['name'])
-    carga = st.text_input(label = "Carga horária", max_chars=128,value=course['workload'])
+    carga = st.number_input(label = "Carga horária", value=course['workload'], step=100)
     s_date = st.date_input(label = "Data", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(sta_data[0]), int(sta_data[1]), int(sta_data[2])))
-    description = st.text_area(label = "Descrição", max_chars=300)
+    description = st.text_area(label = "Descrição", max_chars=300, value=course['description'])
     
     data = {
-        'uid': course['id'],
+        'uid': course['uid'],
         'name': name,
         'workload': carga,
         'date': s_date,
@@ -475,14 +479,14 @@ def delete_course(course):
 def add_cert(id):
     name = st.text_input(label = "Nome", max_chars=32)
     key = st.text_input(label = "Chave de validação", max_chars=128)
-    date = st.date_input(label = "Data", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
+    date_cert = st.date_input(label = "Data", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
     expire_date = st.date_input(label = "Expira", format='DD/MM/YYYY', min_value=date(1900, 1, 1))
     
     data = {
         'uid': id,
         'name': name,
         'validation_key': key,
-        'date': date,
+        'date': date_cert,
         'expire_date': expire_date,
     }
 
@@ -508,7 +512,7 @@ def edit_cert(cert):
     expire_date = st.date_input(label = "Expira", format='DD/MM/YYYY', min_value=date(1900, 1, 1), value=date(int(sta_data2[0]), int(sta_data2[1]), int(sta_data2[2])))
     
     data = {
-        'uid': cert['id'],
+        'uid': cert['uid'],
         'name': name,
         'validation_key': validation_key,
         'date': s_date,
@@ -519,7 +523,7 @@ def edit_cert(cert):
 
     if att:
         try:
-            CertificateAPI.update(cert['id'], CertificateAPI(**data))
+            CertificateAPI.update(cert['id'], Certificate(**data))
             st.success("Certificação atualizada.")
             time.sleep(2)
             st.rerun()
@@ -532,7 +536,7 @@ def delete_cert(cert):
 
     if confirm:
         CertificateAPI.delete(cert['id'])
-        st.success("Certificação removido.")
+        st.success("Certificação removida.")
         time.sleep(2)
         st.rerun()
 

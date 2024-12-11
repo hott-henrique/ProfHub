@@ -4,6 +4,8 @@ from sdk.UserAPI import UserAPI
 from sdk.AcademicBackgroundAPI import AcademicBackgroundAPI
 from model.AcademicBackground import EducationLevel
 from sdk.WorkingExperienceAPI import WorkingExperienceAPI
+from sdk.CourseAPI import CourseAPI
+from sdk.CertificateAPI import CertificateAPI
 
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
@@ -48,6 +50,10 @@ def main():
             search_form(prompt, level_o)
         elif option == "Experiências":
             search_xp(prompt)
+        elif option == "Cursos":
+            search_course(prompt)
+        elif option == "Certificações":
+            search_cert(prompt)
 
 def search_user(prompt):
     user = UserAPI.search_by_text(prompt)
@@ -64,6 +70,20 @@ def search_form(prompt, level):
 
 def search_xp(prompt):
     response = WorkingExperienceAPI.search_by_text(prompt)
+    
+    for form in response:
+        u = UserAPI.search_by_id(form['uid'])
+        st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
+
+def search_course(prompt):
+    response = CourseAPI.search_by_text(prompt)
+    
+    for form in response:
+        u = UserAPI.search_by_id(form['uid'])
+        st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
+
+def search_cert(prompt):
+    response = CertificateAPI.search_by_text(prompt)
     
     for form in response:
         u = UserAPI.search_by_id(form['uid'])
@@ -115,10 +135,34 @@ def view(user):
 
 
     with st.expander("Cursos"):
-        st.write("Em breve...")
+        cour = CourseAPI.get_all_from_uid(user['id'])
+        num = len(cour)
+        container_list = []
+
+        for courseeee in range(num):
+            container_list.append(st.container(border=True, key="container-course" + str(courseeee)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Nome: {cour[index]['name']}")
+                st.write(f"Carga horária: {cour[index]['workload']}")
+                st.write(f"Data: {cour[index]['date'].split('T')[0]}")
+                st.write(f"Descrição: {cour[index]['description']}")
 
     with st.expander("Certificações"):
-        st.write("Em breve...")
+        cert = CertificateAPI.get_all_from_uid(user['id'])
+        num = len(cert)
+        container_list = []
+
+        for ceeeeert in range(num):
+            container_list.append(st.container(border=True, key="container-certifications" + str(ceeeeert)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Nome: {cert[index]['name']}")
+                st.write(f"Chave de validação: {cert[index]['validation_key']}")
+                st.write(f"Data: {cert[index]['date'].split('T')[0]}")
+                st.write(f"Expira: {cert[index]['expire_date']}")
 
     with st.expander("Idiomas"):
         st.write("Em breve...")

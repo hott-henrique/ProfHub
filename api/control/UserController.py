@@ -31,3 +31,10 @@ class UserController(object):
             for a
             in self.persistence.user.search(query=query)
         ]
+
+    def get_most_certified_professionals_by_academic_background(self, academic_background: str, page_sz: int, page: int) -> list[tuple[int, int]]:
+        return self.persistence.user.get_most_certified_professionals_by_academic_background(
+            academic_background=academic_background,
+            page_sz=page_sz,
+            page=page
+        )

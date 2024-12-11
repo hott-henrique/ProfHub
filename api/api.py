@@ -1,9 +1,4 @@
-import os
-
 import fastapi
-
-import psycopg2
-import psycopg2.extras
 
 from api.control.connector import get_controller
 
@@ -28,7 +23,7 @@ async def unhandled_exception_handler(request: fastapi.Request, exc: Exception):
 
     return fastapi.responses.JSONResponse(
         status_code=500,
-        content={ "message": f"Something unkown went wrong, please contact support." }
+        content={ "message": "Something unkown went wrong, please contact support." }
     )
 
 @api.get("/ping")

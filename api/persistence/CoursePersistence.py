@@ -6,7 +6,7 @@ class CoursePersistence(object):
     def create(self, course: dict) -> int | None:
         uid = course["uid"]
         name = course["name"]
-        date = course["starting_date"]
+        date = course["date"]
         workload = course["workload"]
         description = course["description"]
 
@@ -29,7 +29,7 @@ class CoursePersistence(object):
     def update(self, id: int, course: dict):
         uid = course["uid"]
         name = course["name"]
-        date = course["starting_date"]
+        date = course["date"]
         workload = course["workload"]
         description = course["description"]
 

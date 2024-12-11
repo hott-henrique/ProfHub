@@ -14,7 +14,7 @@ class LanguageKnowledgeAPI:
         data["date"] = data["date"].isoformat()
 
         response = requests.post(
-            url=os.environ['API_URL'] + "/api/language_knowledge/",
+            url=os.environ['API_URL'] + "/language_knowledge/",
             json=data
         )
 
@@ -31,7 +31,7 @@ class LanguageKnowledgeAPI:
         data["date"] = data["date"].isoformat()
 
         response = requests.put(
-            url=os.environ['API_URL'] + f"/api/language_knowledge/{id}",
+            url=os.environ['API_URL'] + f"/language_knowledge/{id}",
             json=data
         )
 
@@ -44,7 +44,7 @@ class LanguageKnowledgeAPI:
     @classmethod
     def delete(cls, id: int) -> bool:
         response = requests.delete(
-            url=os.environ['API_URL'] +f"/api/language_knowledge/{id}",
+            url=os.environ['API_URL'] +f"/language_knowledge/{id}",
         )
 
         if not response.ok:
@@ -56,7 +56,7 @@ class LanguageKnowledgeAPI:
     @classmethod
     def get_all_from_uid(cls, uid: int) -> list[LanguageKnowledge]:
         response = requests.get(
-            url=os.environ['API_URL'] +f"/api/language_knowledge/{uid}",
+            url=os.environ['API_URL'] +f"/language_knowledge/{uid}",
         )
 
         if not response.ok:
@@ -68,7 +68,7 @@ class LanguageKnowledgeAPI:
     @classmethod
     def search_by_text(cls, query: str, proficiency_level: LanguageProciencyLevel | None) -> list[LanguageKnowledge]:
         response = requests.get(
-            url=os.environ['API_URL'] +"/api/language_knowledge/search/",
+            url=os.environ['API_URL'] +"/language_knowledge/search/",
             params=dict(query=query, proficiency_level=proficiency_level.value if proficiency_level else None)
         )
 
