@@ -11,8 +11,6 @@ class LanguageKnowledgeAPI:
     def create(cls, language_knowledge: LanguageKnowledge) -> int:
         data = language_knowledge.model_dump()
 
-        data["date"] = data["date"].isoformat()
-
         response = requests.post(
             url=os.environ['API_URL'] + "/language_knowledge/",
             json=data
@@ -27,8 +25,6 @@ class LanguageKnowledgeAPI:
     @classmethod
     def update(cls, id: int, language_knowledge: LanguageKnowledge) -> bool:
         data = language_knowledge.model_dump()
-
-        data["date"] = data["date"].isoformat()
 
         response = requests.put(
             url=os.environ['API_URL'] + f"/language_knowledge/{id}",

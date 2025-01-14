@@ -15,25 +15,26 @@ CREATE TABLE ProfHub.User (
 );
 
 CREATE TYPE ProfHub.Language AS ENUM (
-    "alemão", "árabe", "árabe egípcio",
-    "bengali", "birmanês",
-    "chinê", "coreano", "curdo",
-    "espanhol",
-    "francês",
-    "gujarati",
-    "hausa", "hindi",
-    "indonésio", "inglês", "italiano",
-    "japonês", "javanês",
-    "kannada",
-    "malaiala", "marathi",
-    "oriya",
-    "persa", "polaco", "português", "punjabi",
-    "romeno", "russo",
-    "somali", "sundanês",
-    "tagalog", "tailandês", "tamil", "telugu", "turco",
-    "ucraniano", "urdu",
-    "vietnamita",
+    'alemão', 'árabe', 'árabe egípcio',
+    'bengali', 'birmanês',
+    'chinê', 'coreano', 'curdo',
+    'espanhol',
+    'francês',
+    'gujarati',
+    'hausa', 'hindi',
+    'indonésio', 'inglês', 'italiano',
+    'japonês', 'javanês',
+    'kannada',
+    'malaiala', 'marathi',
+    'oriya',
+    'persa', 'polaco', 'português', 'punjabi',
+    'romeno', 'russo',
+    'somali', 'sundanês',
+    'tagalog', 'tailandês', 'tamil', 'telugu', 'turco',
+    'ucraniano', 'urdu',
+    'vietnamita'
 );
+
 
 CREATE TYPE ProfHub.LanguageProficiencyLevel AS ENUM ('A1', 'A2', 'B1', 'B2', 'C1', 'C2');
 
@@ -46,7 +47,7 @@ CREATE TABLE ProfHub.LanguageKnowledge(
 
     PRIMARY KEY (id),
 
-    FOREIGN KEY (uid) REFERENCES ProfHub.User(id)     ON DELETE CASCADE,
+    FOREIGN KEY (uid) REFERENCES ProfHub.User(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ProfHub.Certificate(

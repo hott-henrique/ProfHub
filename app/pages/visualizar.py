@@ -16,6 +16,8 @@ from model.Course import Course
 from sdk.CourseAPI import CourseAPI
 from model.Certificate import Certificate
 from sdk.CertificateAPI import CertificateAPI
+from sdk.LanguageKnowledgeAPI import LanguageKnowledgeAPI
+from model.LanguageKnowledge import Language, LanguageProciencyLevel, LanguageKnowledge
 
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
@@ -152,7 +154,25 @@ def main():
         st.button("Adicionar certificação", key='add-cert', use_container_width=True, on_click=add_cert, args=(user['id'], ))
 
     with st.expander("Idiomas"):
-        st.write("Em breve...")
+        idiomas = LanguageKnowledgeAPI.get_all_from_uid(user['id'])
+        idiomas = sorted(idiomas, key=lambda x: x['id']) #ordenando por id
+        num = len(idiomas)
+        container_list = []
+
+        for c in range(num):
+            container_list.append(st.container(border=True, key="idiomas-cert" + str(c)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Idioma: {idiomas[index]['language']}")
+                st.write(f"Proeficiência: {idiomas[index]['proficiency_level']}")
+                
+                left, right = st.columns(2, vertical_alignment="bottom")
+
+                left.button("Editar idioma", key=f'editar-idio-{index}', use_container_width=True, on_click=edit_idioma, args=(idiomas[index], ))
+                right.button("Apagar idioma", key=f'apagar-idio-{index}', use_container_width=True, on_click=delete_idioma, args=(idiomas[index], ))
+        
+        st.button("Adicionar idioma", key='add-idio', use_container_width=True, on_click=add_idioma, args=(user['id'], ))
     
 @st.dialog("Editar informações pessoais")
 def edit_user():
@@ -540,6 +560,66 @@ def delete_cert(cert):
         time.sleep(2)
         st.rerun()
 
+@st.dialog("Adicionar idioma")
+def add_idioma(id):
+    idiomas = [language.value for language in Language]
+    proficiencias = [level.value for level in LanguageProciencyLevel]
+
+    idioma = st.selectbox(label = "Idioma", options=idiomas, index=0, placeholder="Selecione o idioma")
+    proef = st.selectbox(label = "Proeficiência", options=proficiencias, index=0, placeholder="Selecione sua proeficiência.")
+    
+    data = {
+        'uid': id,
+        'language': Language(idioma),
+        'proficiency_level': LanguageProciencyLevel(proef)
+    }
+
+    add = st.button("Adicionar", use_container_width=True, key='add-idioma-button') 
+
+    if add:
+        try:
+            LanguageKnowledgeAPI.create(LanguageKnowledge(**data))
+            st.success("Idioma adicionado.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Editar idioma")
+def edit_idioma(idioma_data):
+    idiomas = [language.value for language in Language]
+    proficiencias = [level.value for level in LanguageProciencyLevel]
+
+    idi = st.selectbox(label = "Idioma", options=idiomas, index=idiomas.index(idioma_data['language']))
+    proefici = st.selectbox(label = "Proeficiência", index=idiomas.index(idioma_data['language']), options=proficiencias)
+    
+    
+    data = {
+        'uid': idioma_data['uid'],
+        'language': Language(idi),
+        'proficiency_level': LanguageProciencyLevel(proefici)
+    }
+
+    att = st.button("Atualizar", use_container_width=True, key='att-idioma-button') 
+
+    if att:
+        try:
+            LanguageKnowledgeAPI.update(idioma_data['id'], LanguageKnowledge(**data))
+            st.success("Idioma atualizado.")
+            time.sleep(2)
+            st.rerun()
+        except Exception as e:
+            st.error(f'Erro: {e}')
+
+@st.dialog("Remover idioma")
+def delete_idioma(idio):
+    confirm = st.button("Confirmar exclusão do idioma?", use_container_width=True)
+
+    if confirm:
+        LanguageKnowledgeAPI.delete(idio['id'])
+        st.success("Idioma removido.")
+        time.sleep(2)
+        st.rerun()
 
 if __name__ == "__main__":
     main()

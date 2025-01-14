@@ -38,7 +38,7 @@ class LanguageKnowledgePersistence(object):
                     SET
                         uid = %s,
                         language = %s,
-                        proficiency_level = %s,
+                        proficiency_level = %s
                     WHERE l.id = %s;
                 ''',
                 (uid, language, proficiency_level, id)

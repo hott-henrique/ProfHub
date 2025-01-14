@@ -6,6 +6,7 @@ from model.AcademicBackground import EducationLevel
 from sdk.WorkingExperienceAPI import WorkingExperienceAPI
 from sdk.CourseAPI import CourseAPI
 from sdk.CertificateAPI import CertificateAPI
+from sdk.LanguageKnowledgeAPI import LanguageKnowledgeAPI
 
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
@@ -54,6 +55,8 @@ def main():
             search_course(prompt)
         elif option == "Certificações":
             search_cert(prompt)
+        elif option == "Idiomas":
+            search_idioma(prompt)
 
 def search_user(prompt):
     user = UserAPI.search_by_text(prompt)
@@ -86,6 +89,14 @@ def search_cert(prompt):
     response = CertificateAPI.search_by_text(prompt)
     
     for form in response:
+        u = UserAPI.search_by_id(form['uid'])
+        st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
+
+def search_idioma(prompt):
+    response = LanguageKnowledgeAPI.search_by_text(prompt, None)
+    
+    for form in response['detail']:
+        st.success(response)
         u = UserAPI.search_by_id(form['uid'])
         st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
 
@@ -154,8 +165,8 @@ def view(user):
         num = len(cert)
         container_list = []
 
-        for ceeeeert in range(num):
-            container_list.append(st.container(border=True, key="container-certifications" + str(ceeeeert)))
+        for xcert in range(num):
+            container_list.append(st.container(border=True, key="container-certifications" + str(xcert)))
 
         for index, container in enumerate(container_list):
             with container:
@@ -165,7 +176,17 @@ def view(user):
                 st.write(f"Expira: {cert[index]['expire_date']}")
 
     with st.expander("Idiomas"):
-        st.write("Em breve...")
+        idiomas = LanguageKnowledgeAPI.get_all_from_uid(user['id'])
+        num = len(idiomas)
+        container_list = []
 
+        for xidiomas in range(num):
+            container_list.append(st.container(border=True, key="container-idiomas" + str(xidiomas)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Idioma: {idiomas[index]['language']}")
+                st.write(f"Proeficiência: {idiomas[index]['proficiency_level']}")
+                
 if __name__ == "__main__":
     main()
