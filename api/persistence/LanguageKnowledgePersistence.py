@@ -85,7 +85,7 @@ class LanguageKnowledgePersistence(object):
                     SELECT *
                     FROM ProfHub.LanguageKnowledge AS l
                     WHERE
-                        l.language ILIKE %(query)s
+                        l.language::TEXT ILIKE %(query)s
                 ''',
                 { "query": f"%{query}%" }
             )

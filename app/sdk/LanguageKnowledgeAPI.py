@@ -72,4 +72,4 @@ class LanguageKnowledgeAPI:
             if response.status_code >= 500:
                 raise Exception("Algo de errado no servidor, por favor, contate o suporte.")
 
-        return response.json()
+        return  response.json()

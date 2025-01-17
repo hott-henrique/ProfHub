@@ -50,7 +50,7 @@ def get_all_from_uid(uid: int) -> list[LanguageKnowledge]:
     return controller.language_knowledge.get_all_from_uid(uid=uid)
 
 @router.get("/search/")
-def search_by_text(query: str, proficiency_level: LanguageProciencyLevel | None) -> list[LanguageKnowledge]:
+def search_by_text(query: str, proficiency_level: LanguageProciencyLevel | None = None) -> list[LanguageKnowledge]:
     controller = get_controller()
 
     return controller.language_knowledge.search_by_text(query=query, proficiency_level=proficiency_level)

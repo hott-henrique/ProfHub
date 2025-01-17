@@ -34,10 +34,10 @@ def main():
     option = st.selectbox(
         "Selecione o tipo de busca", ("Usuário", "Formação acadêmica", "Experiências", "Certificações", "Cursos", "Idiomas"),
     )
-    
+
     if option == "Formação acadêmica":
         levels = ['Técnico', 'Graduação', 'Pós-graduação', 'Mestrado', 'Doutorado', 'Pós-doutorado']
-        mapa = {'Técnico' : 'technical', 'Graduação' : 'undergraduate', 'Pós-graduação' : 'postgraduate', 
+        mapa = {'Técnico' : 'technical', 'Graduação' : 'undergraduate', 'Pós-graduação' : 'postgraduate',
         'Mestrado': 'master', 'Doutorado': 'doctorate', 'Pós-doutorado': 'postdoctorate'}
         level = st.selectbox(label = "Nível", options=levels)
         level_o = mapa[level]
@@ -60,43 +60,42 @@ def main():
 
 def search_user(prompt):
     user = UserAPI.search_by_text(prompt)
-    
+
     for u in user:
         st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
-            
+
 def search_form(prompt, level):
     response = AcademicBackgroundAPI.search_by_text(prompt, EducationLevel(level))
-    
+
     for form in response:
         u = UserAPI.search_by_id(form['uid'])
         st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
 
 def search_xp(prompt):
     response = WorkingExperienceAPI.search_by_text(prompt)
-    
+
     for form in response:
         u = UserAPI.search_by_id(form['uid'])
         st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
 
 def search_course(prompt):
     response = CourseAPI.search_by_text(prompt)
-    
+
     for form in response:
         u = UserAPI.search_by_id(form['uid'])
         st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
 
 def search_cert(prompt):
     response = CertificateAPI.search_by_text(prompt)
-    
+
     for form in response:
         u = UserAPI.search_by_id(form['uid'])
         st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
 
 def search_idioma(prompt):
     response = LanguageKnowledgeAPI.search_by_text(prompt, None)
-    
-    for form in response['detail']:
-        st.success(response)
+
+    for form in response:
         u = UserAPI.search_by_id(form['uid'])
         st.button(label=u['name'], use_container_width=True, key="preview-" + str(u['id']), on_click=view, args=(u,))
 
@@ -114,11 +113,11 @@ def view(user):
         formations = AcademicBackgroundAPI.get_all_from_uid(user['id'])
         num_formations = len(formations)
         container_list_formations = []
-        
+
         for x in range(num_formations):
             container_list_formations.append(st.container(border=True, key="container-form" + str(x)))
-        
-        for index_formation, container_formation in enumerate(container_list_formations):    
+
+        for index_formation, container_formation in enumerate(container_list_formations):
             with container_formation:
                 st.write(f"Nome: {formations[index_formation]['name']}")
                 st.write(f"Instituição: {formations[index_formation]['institution']}")
@@ -127,7 +126,7 @@ def view(user):
                 st.write(f"Carga horária: {formations[index_formation]['workload']}")
                 st.write(f"Descrição: {formations[index_formation]['description']}")
                 st.write(f"Nível: {formations[index_formation]['level']}")
-    
+
     with st.expander("Experiências profissionais"):
         xp = WorkingExperienceAPI.get_all_from_uid(user['id'])
         num = len(xp)
@@ -187,6 +186,6 @@ def view(user):
             with container:
                 st.write(f"Idioma: {idiomas[index]['language']}")
                 st.write(f"Proeficiência: {idiomas[index]['proficiency_level']}")
-                
+
 if __name__ == "__main__":
     main()
