@@ -50,15 +50,41 @@ class UserAPI:
 
     @classmethod
     def search_by_id(cls, id: int) -> User:
-        
+
         response = requests.get(
             url=os.environ['API_URL'] + f"/user/{id}",
         )
-        
+
         if not response.ok:
             if response.status_code == 404:
                 raise Exception(f"Usuário com ID {id} não encontrado.")
             elif response.status_code >= 500:
                 raise Exception("Algo de errado no servidor, por favor, contate o suporte.")
-        
+
+        return response.json()
+
+    @classmethod
+    def most_certified_professionals(cls, academic_background: str, page: int = 0, page_sz: int = 10) -> list[dict[str, int]]:
+        response = requests.get(
+            url=os.environ['API_URL'] + f"/user/most-certified/{academic_background}",
+            params=dict(page=page, page_sz=page_sz)
+        )
+
+        if not response.ok:
+            if response.status_code >= 500:
+                raise Exception("Algo de errado no servidor, por favor, contate o suporte.")
+
+        return response.json()
+
+    @classmethod
+    def background_check(cls, term: str, page: int = 0, page_sz: int = 10) -> list[dict[str, int]]:
+        response = requests.get(
+            url=os.environ['API_URL'] + f"/user/background-check/{term}",
+            params=dict(page=page, page_sz=page_sz)
+        )
+
+        if not response.ok:
+            if response.status_code >= 500:
+                raise Exception("Algo de errado no servidor, por favor, contate o suporte.")
+
         return response.json()

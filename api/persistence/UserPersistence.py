@@ -139,7 +139,7 @@ class UserPersistence(object):
 
             return cursor.fetchall()
 
-    def get_most_certified_professionals_by_academic_background(self, academic_background: str, page_sz: int, page: int) -> list[tuple[int, int]]:
+    def get_most_certified_professionals_by_academic_background(self, academic_background: str, page_sz: int, page: int) -> list[dict[str, int]]:
         db = get_postgres_db()
 
         with db.cursor() as cursor:
@@ -153,11 +153,51 @@ class UserPersistence(object):
                          FROM ProfHub.Certificate AS c
                          GROUP BY c.uid) AS gp
                     ON u.id = gp.uid
-                    WHERE u.id IN (SELECT DISTINCT uid FROM ProfHub.AcademicBackground as a WHERE a.name = %s)
+                    WHERE u.id IN (SELECT DISTINCT uid FROM ProfHub.AcademicBackground as a WHERE a.name ILIKE %s)
                     ORDER BY gp.count DESC
                     LIMIT %s OFFSET %s;
                 ''',
-                (academic_background, page_sz, page * page_sz)
+                (f"%{academic_background}%", page_sz, page * page_sz)
             )
 
             return cursor.fetchall()
+
+    def background_check(self, term: str, page_sz: int, page: int) -> list[dict[str, int]]:
+            db = get_postgres_db()
+
+            with db.cursor() as cursor:
+                cursor.execute(
+                    '''
+                        WITH UserMentions AS (
+                            SELECT u.id, COUNT(*) AS occurrences
+                            FROM ProfHub.User u
+                            LEFT JOIN ProfHub.Course c ON u.id = c.uid
+                            LEFT JOIN ProfHub.WorkingExperience w ON u.id = w.uid
+                            LEFT JOIN ProfHub.AcademicBackground a ON u.id = a.uid
+                            LEFT JOIN ProfHub.Certificate cert ON u.id = cert.uid
+                            LEFT JOIN ProfHub.LanguageKnowledge lk ON u.id = lk.uid
+                            WHERE
+                                c.description ILIKE %(term)s OR
+                                c.name ILIKE %(term)s OR
+                                w.description ILIKE %(term)s OR
+                                w.job ILIKE %(term)s OR
+                                w.company ILIKE %(term)s OR
+                                a.description ILIKE %(term)s OR
+                                a.name ILIKE %(term)s OR
+                                a.institution ILIKE %(term)s OR
+                                cert.name ILIKE %(term)s OR
+                                lk.language::text ILIKE %(term)s
+                            GROUP BY u.id
+                        )
+                        SELECT * FROM UserMentions
+                        ORDER BY occurrences DESC
+                        LIMIT %(page_sz)s OFFSET %(offset)s;
+                    ''',
+                    dict(term=f"%{term}%", page_sz=page_sz, offset=page * page_sz)
+                )
+
+                data = cursor.fetchall()
+
+                print(data)
+
+                return data

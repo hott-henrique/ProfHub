@@ -32,9 +32,12 @@ class UserController(object):
             in self.persistence.user.search(query=query)
         ]
 
-    def get_most_certified_professionals_by_academic_background(self, academic_background: str, page_sz: int, page: int) -> list[tuple[int, int]]:
+    def get_most_certified_professionals_by_academic_background(self, academic_background: str, page_sz: int, page: int) -> list[dict[str, int]]:
         return self.persistence.user.get_most_certified_professionals_by_academic_background(
             academic_background=academic_background,
             page_sz=page_sz,
             page=page
         )
+
+    def background_check(self, term: str, page_sz: int, page: int) -> list[dict[str, int]]:
+        return self.persistence.user.background_check(term=term, page_sz=page_sz, page=page)
