@@ -65,9 +65,10 @@ def cadastro():
         else:
             st.error("As senhas divergem, verifique.")
 
-@st.dialog("Busca")
+@st.dialog("Currículos")
 def search(prompt):
-    response = UserAPI.search_by_text(prompt)
+    response = UserAPI.background_check(prompt)
+    
     num = len(response)
     container_list = []
 
@@ -75,14 +76,45 @@ def search(prompt):
         container_list.append(st.container(border=True, key="container" + str(exp)))
 
     for index, container in enumerate(container_list):
+        xd = UserAPI.search_by_id(response[index]["id"])
         with container:
             c1, c2, c3 = st.columns(3, vertical_alignment="center")
 
-            c1.write(f"{response[index]['name']}")
+            c1.write(f"{xd['name']}")
             b = c3.button("Visualizar", key="button" + str(index))
 
             if b:
-                st.session_state['view_user'] = response[index]
+                st.session_state['view_user'] = xd
+                st.switch_page("pages/preview.py")
+
+@st.dialog("Usuários com certificações")
+def most_certifications(prompt):
+    response = UserAPI.most_certified_professionals(academic_background=prompt)
+    
+    num = len(response)
+    container_list = []
+
+    for cert in range(num):
+        container_list.append(st.container(border=True, key="container" + str(cert)))
+
+    for index, container in enumerate(container_list):
+        xd = UserAPI.search_by_id(response[index]["id"])
+        num_cert = response[index]['count']
+
+        with container:
+            c1, c2, c3 = st.columns(3, vertical_alignment="center")
+
+            if num_cert > 1:
+                c1.write(f"{xd['name']}")
+                c2.write(f"{num_cert} certificações.")
+            else:
+                c1.write(f"{xd['name']}")
+                c2.write(f"{num_cert} certificação.")
+
+            b = c3.button("Visualizar", key="button" + str(index))
+
+            if b:
+                st.session_state['view_user'] = xd
                 st.switch_page("pages/preview.py")
 
 def main():
@@ -99,8 +131,11 @@ def main():
         )
 
         if selected == "Início":
-            prompt = st.chat_input(placeholder="Faça sua busca")
+            prompt = st.chat_input(placeholder="Busque um currículo")
             if prompt: search(prompt)
+            
+            input = st.chat_input("Busque uma formação acadêmica")
+            if input: most_certifications(input)
         if selected == "Login":
             login()
         elif selected == "Cadastro":

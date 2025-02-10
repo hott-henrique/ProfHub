@@ -1,6 +1,10 @@
 import streamlit as st
 from sdk.AcademicBackgroundAPI import AcademicBackgroundAPI
 from sdk.WorkingExperienceAPI import WorkingExperienceAPI
+from sdk.CourseAPI import CourseAPI
+from sdk.CertificateAPI import CertificateAPI
+from sdk.LanguageKnowledgeAPI import LanguageKnowledgeAPI
+
 def main():
     st.set_page_config(page_title='ProfHub', page_icon=':material/person:')
     user = st.session_state['view_user'] if 'view_user' in st.session_state else st.switch_page("busca.py")
@@ -61,13 +65,49 @@ def main():
                 st.write(f"Descrição: {xp[index]['description']}")
 
     with st.expander("Cursos"):
-        st.write("Em breve...")
+        cou = CourseAPI.get_all_from_uid(user['id'])
+        num = len(xp)
+        container_list = []
+
+        for cu in range(num):
+            container_list.append(st.container(border=True, key="container-cu" + str(cu)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Nome: {cou[index]['name']}")
+                st.write(f"Workload: {cou[index]['workload']}")
+                st.write(f"Data: {cou[index]['date'].split('T')[0]}")
+                st.write(f"Descrição: {cou[index]['description']}")
 
     with st.expander("Certificações"):
-        st.write("Em breve...")
+        cert = CertificateAPI.get_all_from_uid(user['id'])
+        cert = sorted(cert, key=lambda x: x['id'])
+        num = len(cert)
+        container_list = []
+
+        for c in range(num):
+            container_list.append(st.container(border=True, key="container-cert" + str(c)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Nome: {cert[index]['name']}")
+                st.write(f"Chave para validação: {cert[index]['validation_key']}")
+                st.write(f"Data da obtenção: {cert[index]['date'].split('T')[0]}")
+                st.write(f"Expira em: {cert[index]['date'].split('T')[0]}")
 
     with st.expander("Idiomas"):
-        st.write("Em breve...")
+        idiomas = LanguageKnowledgeAPI.get_all_from_uid(user['id'])
+        idiomas = sorted(idiomas, key=lambda x: x['id']) #ordenando por id
+        num = len(idiomas)
+        container_list = []
+
+        for c in range(num):
+            container_list.append(st.container(border=True, key="idiomas-cert" + str(c)))
+
+        for index, container in enumerate(container_list):
+            with container:
+                st.write(f"Idioma: {idiomas[index]['language']}")
+                st.write(f"Proeficiência: {idiomas[index]['proficiency_level']}")
 
 if __name__ == "__main__":
     main()
